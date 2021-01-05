@@ -1,4 +1,8 @@
 "use strict";
+var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {
+    if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
+    return cooked;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,11 +39,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var _a, _b;
 console.log("webgl.ts");
-// Documentation
-var vsSource = (_a = document.getElementById("vsSource")) === null || _a === void 0 ? void 0 : _a.innerText;
-var fsSource = (_b = document.getElementById("fsSource")) === null || _b === void 0 ? void 0 : _b.innerText;
+// SHADERS
+// @ts-ignore
+var vsSource = glsl(__makeTemplateObject(["\n\n#ifdef GL_FRAGMENT_PRECISION_HIGH\n\tprecision highp float;\n#else\n\tprecision mediump float;\n#endif\n\nattribute vec2 a_VertexPosition;\nattribute vec2 a_UVCoords;\n\nvarying vec2 v_UVCoords;\n\nvoid main(){\n\tgl_PointSize = 10.0;\n\tgl_Position = vec4(a_VertexPosition,0,1);\n}\n"], ["\n\n#ifdef GL_FRAGMENT_PRECISION_HIGH\n\tprecision highp float;\n#else\n\tprecision mediump float;\n#endif\n\nattribute vec2 a_VertexPosition;\nattribute vec2 a_UVCoords;\n\nvarying vec2 v_UVCoords;\n\nvoid main(){\n\tgl_PointSize = 10.0;\n\tgl_Position = vec4(a_VertexPosition,0,1);\n}\n"]));
+// @ts-ignore
+var fsSource = glsl(__makeTemplateObject(["\n\n#ifdef GL_FRAGMENT_PRECISION_HIGH\n\tprecision highp float;\n#else\n\tprecision mediump float;\n#endif\n\n#define numTextures 1\n\nprecision mediump float;\n\nuniform sampler2D u_Textures[numTextures];\n\nvoid main(){\n\tgl_FragColor = vec4(1,1,0,1);\n}\n"], ["\n\n#ifdef GL_FRAGMENT_PRECISION_HIGH\n\tprecision highp float;\n#else\n\tprecision mediump float;\n#endif\n\n#define numTextures 1\n\nprecision mediump float;\n\nuniform sampler2D u_Textures[numTextures];\n\nvoid main(){\n\tgl_FragColor = vec4(1,1,0,1);\n}\n"]));
 // Canvas & gl
 var canvas = document.getElementById("canvas");
 var gl = canvas.getContext("webgl")
