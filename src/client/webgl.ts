@@ -1,9 +1,9 @@
 console.log("webgl.ts");
 
 // SHADERS
-import vsSource from "./vertex.glsl";
+import vsSource from "./shaders/vertex.glsl";
 
-import fsSource from "./fragment.glsl";
+import fsSource from "./shaders/fragment.glsl";
 
 // Canvas & gl
 const canvas = document.getElementById("canvas")! as HTMLCanvasElement;
