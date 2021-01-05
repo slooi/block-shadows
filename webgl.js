@@ -1,8 +1,4 @@
 "use strict";
-var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {
-    if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
-    return cooked;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -39,12 +35,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 console.log("webgl.ts");
 // SHADERS
-// @ts-ignore
-var vsSource = glsl(__makeTemplateObject(["\n\n#ifdef GL_FRAGMENT_PRECISION_HIGH\n\tprecision highp float;\n#else\n\tprecision mediump float;\n#endif\n\nattribute vec2 a_VertexPosition;\nattribute vec2 a_UVCoords;\n\nvarying vec2 v_UVCoords;\n\nvoid main(){\n\tgl_PointSize = 10.0;\n\tgl_Position = vec4(a_VertexPosition,0,1);\n}\n"], ["\n\n#ifdef GL_FRAGMENT_PRECISION_HIGH\n\tprecision highp float;\n#else\n\tprecision mediump float;\n#endif\n\nattribute vec2 a_VertexPosition;\nattribute vec2 a_UVCoords;\n\nvarying vec2 v_UVCoords;\n\nvoid main(){\n\tgl_PointSize = 10.0;\n\tgl_Position = vec4(a_VertexPosition,0,1);\n}\n"]));
-// @ts-ignore
-var fsSource = glsl(__makeTemplateObject(["\n\n#ifdef GL_FRAGMENT_PRECISION_HIGH\n\tprecision highp float;\n#else\n\tprecision mediump float;\n#endif\n\n#define numTextures 1\n\nprecision mediump float;\n\nuniform sampler2D u_Textures[numTextures];\n\nvoid main(){\n\tgl_FragColor = vec4(1,1,0,1);\n}\n"], ["\n\n#ifdef GL_FRAGMENT_PRECISION_HIGH\n\tprecision highp float;\n#else\n\tprecision mediump float;\n#endif\n\n#define numTextures 1\n\nprecision mediump float;\n\nuniform sampler2D u_Textures[numTextures];\n\nvoid main(){\n\tgl_FragColor = vec4(1,1,0,1);\n}\n"]));
+var vertex_glsl_1 = __importDefault(require("vertex.glsl"));
+var fragment_glsl_1 = __importDefault(require("fragment.glsl"));
 // Canvas & gl
 var canvas = document.getElementById("canvas");
 var gl = canvas.getContext("webgl")
@@ -155,8 +153,8 @@ function buildShader(type, shaderSource) {
 function buildProgram() {
     try {
         var program_1 = gl.createProgram();
-        gl.attachShader(program_1, buildShader(gl.VERTEX_SHADER, vsSource));
-        gl.attachShader(program_1, buildShader(gl.FRAGMENT_SHADER, fsSource));
+        gl.attachShader(program_1, buildShader(gl.VERTEX_SHADER, vertex_glsl_1.default));
+        gl.attachShader(program_1, buildShader(gl.FRAGMENT_SHADER, fragment_glsl_1.default));
         gl.linkProgram(program_1);
         gl.validateProgram(program_1);
         if (!gl.getProgramParameter(program_1, gl.LINK_STATUS)) {
