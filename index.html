@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Block Shadows</title>
+  </head>
+  <body>
+    <canvas width="500" height="500" id="canvas"></canvas>
+    <script type="shaders" id="vsSource">
+         #ifdef GL_FRAGMENT_PRECISION_HIGH
+         	precision highp float;
+         #else
+         	precision mediump float;
+         #endif
+
+         attribute vec2 a_VertexPosition;
+      attribute vec2 a_UVCoords;
+
+      varying vec2 v_UVCoords;
+
+         void main(){
+         	gl_PointSize = 10.0;
+         	gl_Position = vec4(a_VertexPosition,0,1);
+         }
+    </script>
+    <script type="shaders" id="fsSource">
+      #ifdef GL_FRAGMENT_PRECISION_HIGH
+      	precision highp float;
+      #else
+      	precision mediump float;
+      #endif
+
+      #define numTextures 1
+
+      precision mediump float;
+
+      uniform sampler2D u_Textures[numTextures];
+
+      void main(){
+      	gl_FragColor = vec4(1,1,0,1);
+      }
+    </script>
+    <script src="main.js"></script>
+    <script src="webgl.js"></script>
+  </body>
+</html>
