@@ -10,9 +10,9 @@ module.exports = {
         hot: true,
         open: true,
         proxy: {
-            // "/": {
-            //     target: "http://localhost:8000/",
-            // },
+            "/": {
+                target: "http://localhost:8000/",
+            },
         },
     },
     mode: "development",
