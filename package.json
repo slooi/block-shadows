@@ -4,13 +4,12 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "start": "tsc-watch",
-        "start2": "npm-run-all --parallel watch:build2 watch:server2 node:server",
+        "startO": "tsc-watch",
+        "start": "npm-run-all --parallel watch:client watch:server start:server",
         "watch:client": "webpack serve --mode development --config client.common.js",
-        "watch:server": "tsc-watch --onSuccess \"node ./dist/server/server.js\"",
-        "watch:server2": "webpack --mode development --config server.common.js",
-        "start:server": "node ./dist/server/server.js",
-        "node:server": "nodemon ./dist/server/server.js",
+        "build:client": "webpack --mode development --config client.production.js",
+        "watch:server": "webpack --mode development --config server.common.js",
+        "start:server": "nodemon ./dist/server/server.js",
         "watch:build2": "webpack serve --host 0.0.0.0 --config client.common.js"
     },
     "author": "",

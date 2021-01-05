@@ -94,7 +94,7 @@ async function buildTexture() {
 function loadImage() {
     return new Promise<HTMLImageElement>((resolve, reject) => {
         const img = new Image();
-        img.src = "tilemap.png";
+        img.src = "./tilemap.png";
         img.onload = function () {
             resolve(img);
         };
