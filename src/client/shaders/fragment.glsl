@@ -5,14 +5,14 @@
 	precision mediump float;
 #endif
 
-#define numTextures 1
+//#define numTextures 1
 
 precision mediump float;
 
 
 varying vec2 v_UVCoords;
-uniform sampler2D u_Textures[numTextures];
+uniform sampler2D u_Textures;
 
 void main(){
-	gl_FragColor = vec4(1,1,0,1);
+	gl_FragColor = texture2D(u_Textures,v_UVCoords);//vec4(1,1,0,1);
 }

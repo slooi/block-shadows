@@ -11,22 +11,13 @@ let gl = canvas.getContext("webgl")
     ? <WebGLRenderingContext>canvas.getContext("webgl")
     : (canvas.getContext("experimental-webgl") as WebGLRenderingContext);
 
-gl.viewport(0, 0, 500, 500);
+gl.viewport(0, 0, 400, 400);
 gl.clearColor(0, 0, 1, 1);
 gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 // program
 const program = buildProgram();
 gl.useProgram(program);
-
-// Data
-// prettier-ignore
-const positions = [
-//	x	y			u		v
-	0,	0,			
-	0.5,	0,
-	0.5,	0.5
-]
 
 // locations
 // attribute
@@ -42,29 +33,66 @@ for (let i = 0; i < gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES); i++) 
 
 // locations
 // uniforms
+const uniformLocations: { [key: string]: WebGLUniformLocation | null } = {};
+for (let i = 0; i < gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS); i++) {
+    try {
+        const uniformName = gl.getActiveUniform(program, i)!.name;
+        uniformLocations[uniformName] = gl.getUniformLocation(program, uniformName);
+    } catch (err) {
+        throw new Error(`${err}`);
+    }
+}
+
+// Data
+// prettier-ignore
+const data = [
+//	x	y			u		v
+	0,	0,			0,		0,
+	0.5,	0,		1,		1,
+	0.5,	0.5,		1,		1
+]
 
 // Buffer
 const arrayBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, arrayBuffer);
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-
-// uniform
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
 
 // pointer
-// gl.enableVertexAttribArray(attribLocations[])
-gl.vertexAttribPointer(attribLocations["a_VertexPosition"], 2, gl.FLOAT, false, 0, 0);
+// Vertex Positions
+gl.vertexAttribPointer(
+    attribLocations["a_VertexPosition"],
+    2,
+    gl.FLOAT,
+    false,
+    Float32Array.BYTES_PER_ELEMENT * 4,
+    Float32Array.BYTES_PER_ELEMENT * 0
+);
 gl.enableVertexAttribArray(attribLocations["a_VertexPosition"]);
+
+// UV Coords
+gl.vertexAttribPointer(
+    attribLocations["a_UVCoords"],
+    2,
+    gl.FLOAT,
+    false,
+    Float32Array.BYTES_PER_ELEMENT * 4,
+    Float32Array.BYTES_PER_ELEMENT * 2
+);
+gl.enableVertexAttribArray(attribLocations["a_UVCoords"]);
 
 // Textures
 const texture = buildTexture();
+// gl.activeTexture(gl.TEXTURE0 + 0);
 
 // uniform
+// gl.uniform1i(uniformLocations.u_Textures, 0);
 
 // drawArrays
-
-gl.clear(gl.COLOR_BUFFER_BIT);
-gl.drawArrays(gl.POINTS, 0, positions.length / 2);
-gl.drawArrays(gl.TRIANGLES, 0, positions.length / 2);
+setTimeout(() => {
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.POINTS, 0, data.length / 4);
+    gl.drawArrays(gl.TRIANGLES, 0, data.length / 4);
+}, 1000);
 
 // FUNCTIONS
 // console.log(gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS));
