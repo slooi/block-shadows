@@ -11,6 +11,6 @@ varying vec2 v_UVCoords;
 void main(){
 	v_UVCoords = a_UVCoords;
 
-	gl_PointSize = 10.0;
+	gl_PointSize = 16.0;
 	gl_Position = vec4(a_VertexPosition,0,1);
 }

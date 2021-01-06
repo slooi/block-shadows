@@ -7,13 +7,19 @@ import fsSource from "./shaders/fragment.glsl";
 
 // Canvas & gl
 const canvas = document.getElementById("canvas")! as HTMLCanvasElement;
-let gl = canvas.getContext("webgl")
+let gl = canvas.getContext("webgl", { premultipliedAlpha: false, antialias: true })
     ? <WebGLRenderingContext>canvas.getContext("webgl")
     : (canvas.getContext("experimental-webgl") as WebGLRenderingContext);
 
+// Setup
 gl.viewport(0, 0, 400, 400);
 gl.clearColor(0, 0, 1, 1);
 gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+gl.enable(gl.BLEND);
+gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+gl.blendEquation(gl.FUNC_ADD);
+// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+// glBlendEquation(GL_FUNC_ADD);
 
 // program
 const program = buildProgram();
@@ -91,7 +97,7 @@ const texture = buildTexture();
 setTimeout(() => {
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.POINTS, 0, data.length / 4);
-    gl.drawArrays(gl.TRIANGLES, 0, data.length / 4);
+    // gl.drawArrays(gl.TRIANGLES, 0, data.length / 4);
 }, 1000);
 
 // FUNCTIONS
@@ -105,18 +111,58 @@ async function buildTexture() {
         const texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, texture);
 
-        const img = await loadImage();
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+        if (0) {
+            const img = await loadImage();
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+        } else {
+            const level = 0;
+            const internalFormat = gl.RGBA;
+            const width = 4;
+            const height = 1;
+            const border = 0;
+            const srcFormat = gl.RGBA;
+            const srcType = gl.UNSIGNED_BYTE;
+            //prettier-ignore
+            const pixel = new Uint8Array(createTexData(width)); // opaque blue
+            gl.texImage2D(
+                gl.TEXTURE_2D,
+                level,
+                internalFormat,
+                width,
+                height,
+                border,
+                srcFormat,
+                srcType,
+                pixel
+            );
+        }
 
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 
         return texture;
     } catch (err) {
         throw new Error(`ERROR: ${err}`);
     }
+}
+
+function createTexData(numOfSteps: number = 2) {
+    const tex = [];
+    // tex.push(255, 0, 0, 255);
+    for (let i = 0; i < numOfSteps - 1; i++) {
+        tex.push(255, 0, 0, 255 * (i / numOfSteps - 1));
+        // tex.push(255, 0, 0, 255);
+    }
+    // for (let i = 255; i >= 0; i = i - 255 / (numOfSteps - 2)) {
+    //     console.log("i", i);
+    //     tex.push(255, 0, 0, i);
+    // }
+    // console.log(tex.length);
+    tex.push(255, 0, 0, 255);
+
+    return tex;
 }
 
 function loadImage() {
