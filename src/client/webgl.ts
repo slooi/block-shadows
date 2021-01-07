@@ -10,99 +10,107 @@ const canvas = document.getElementById("canvas")! as HTMLCanvasElement;
 let gl = canvas.getContext("webgl", { premultipliedAlpha: false, antialias: true })
     ? <WebGLRenderingContext>canvas.getContext("webgl")
     : (canvas.getContext("experimental-webgl") as WebGLRenderingContext);
+let textureAtlas: HTMLImageElement;
 
-// Setup
-gl.viewport(0, 0, 400, 400);
-gl.clearColor(0, 0, 1, 1);
-gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-gl.enable(gl.BLEND);
-gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-gl.blendEquation(gl.FUNC_ADD);
-// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-// glBlendEquation(GL_FUNC_ADD);
+setup();
 
-// program
-const program = buildProgram();
-gl.useProgram(program);
-
-// locations
-// attribute
-const attribLocations: { [key: string]: number } = {};
-for (let i = 0; i < gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES); i++) {
-    try {
-        const attribName = gl.getActiveAttrib(program, i)!.name;
-        attribLocations[attribName] = gl.getAttribLocation(program, attribName);
-    } catch (err) {
-        throw new Error(`ERROR: ${err}`);
-    }
+async function setup() {
+    console.log("Loading textureAtlas");
+    textureAtlas = await loadImage();
+    console.log("Running webgl setup");
+    webglSetup();
 }
 
-// locations
-// uniforms
-const uniformLocations: { [key: string]: WebGLUniformLocation | null } = {};
-for (let i = 0; i < gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS); i++) {
-    try {
-        const uniformName = gl.getActiveUniform(program, i)!.name;
-        uniformLocations[uniformName] = gl.getUniformLocation(program, uniformName);
-    } catch (err) {
-        throw new Error(`${err}`);
+function webglSetup() {
+    // Setup
+    gl.viewport(0, 0, 400, 400);
+    gl.clearColor(0, 0, 1, 1);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.blendEquation(gl.FUNC_ADD);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // glBlendEquation(GL_FUNC_ADD);
+
+    // program
+    const program = buildProgram();
+    gl.useProgram(program);
+
+    // locations
+    // attribute
+    const attribLocations: { [key: string]: number } = {};
+    for (let i = 0; i < gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES); i++) {
+        try {
+            const attribName = gl.getActiveAttrib(program, i)!.name;
+            attribLocations[attribName] = gl.getAttribLocation(program, attribName);
+        } catch (err) {
+            throw new Error(`ERROR: ${err}`);
+        }
     }
-}
 
-// Data
-// prettier-ignore
-const data = [
-//	x	y			u		v
-	0,	0,			0,		0,
-	0.5,	0,		1,		1,
-	0.5,	0.5,		1,		1
-]
+    // locations
+    // uniforms
+    const uniformLocations: { [key: string]: WebGLUniformLocation | null } = {};
+    for (let i = 0; i < gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS); i++) {
+        try {
+            const uniformName = gl.getActiveUniform(program, i)!.name;
+            uniformLocations[uniformName] = gl.getUniformLocation(program, uniformName);
+        } catch (err) {
+            throw new Error(`${err}`);
+        }
+    }
 
-// Buffer
-const arrayBuffer = gl.createBuffer();
-gl.bindBuffer(gl.ARRAY_BUFFER, arrayBuffer);
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+    // Data
+    // prettier-ignore
+    const data = [
+	//	x	y			u		v
+		0,	0,			0,		0,
+		0.5,	0,		1,		1,
+		0.5,	0.5,		1,		1
+	]
 
-// pointer
-// Vertex Positions
-gl.vertexAttribPointer(
-    attribLocations["a_VertexPosition"],
-    2,
-    gl.FLOAT,
-    false,
-    Float32Array.BYTES_PER_ELEMENT * 4,
-    Float32Array.BYTES_PER_ELEMENT * 0
-);
-gl.enableVertexAttribArray(attribLocations["a_VertexPosition"]);
+    // Buffer
+    const arrayBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, arrayBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
 
-// UV Coords
-gl.vertexAttribPointer(
-    attribLocations["a_UVCoords"],
-    2,
-    gl.FLOAT,
-    false,
-    Float32Array.BYTES_PER_ELEMENT * 4,
-    Float32Array.BYTES_PER_ELEMENT * 2
-);
-gl.enableVertexAttribArray(attribLocations["a_UVCoords"]);
+    // pointer
+    // Vertex Positions
+    gl.vertexAttribPointer(
+        attribLocations["a_VertexPosition"],
+        2,
+        gl.FLOAT,
+        false,
+        Float32Array.BYTES_PER_ELEMENT * 4,
+        Float32Array.BYTES_PER_ELEMENT * 0
+    );
+    gl.enableVertexAttribArray(attribLocations["a_VertexPosition"]);
 
-// Textures
-gl.activeTexture(gl.TEXTURE0 + 0);
-const texture = buildTexture(32);
-gl.activeTexture(gl.TEXTURE0 + 1);
-const texture2 = buildTexture(16);
-// gl.bindTexture(gl.TEXTURE_2D, texture);
+    // UV Coords
+    gl.vertexAttribPointer(
+        attribLocations["a_UVCoords"],
+        2,
+        gl.FLOAT,
+        false,
+        Float32Array.BYTES_PER_ELEMENT * 4,
+        Float32Array.BYTES_PER_ELEMENT * 2
+    );
+    gl.enableVertexAttribArray(attribLocations["a_UVCoords"]);
 
-// uniform
-// gl.uniform1i(uniformLocations.u_Textures, 0);
-gl.uniform1i(uniformLocations.u_Textures, 0); //!@#!@#!@# change laters
+    // Textures
+    gl.activeTexture(gl.TEXTURE0 + 0);
+    const texture = buildTexture(32);
+    // gl.bindTexture(gl.TEXTURE_2D, texture);
 
-// drawArrays
-setTimeout(() => {
+    // uniform
+    // gl.uniform1i(uniformLocations.u_Textures, 0);
+    gl.uniform1i(uniformLocations.u_Textures, 0); //!@#!@#!@# change laters
+
+    // drawArrays
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.POINTS, 0, data.length / 4);
     gl.drawArrays(gl.TRIANGLES, 0, data.length / 4);
-}, 0);
+}
 
 // FUNCTIONS
 async function buildTexture(inputWidth: number) {
@@ -110,8 +118,8 @@ async function buildTexture(inputWidth: number) {
         const texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, texture);
 
-        if (0) {
-            const img = await loadImage();
+        if (1) {
+            const img = textureAtlas;
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
         } else {
             const level = 0;
