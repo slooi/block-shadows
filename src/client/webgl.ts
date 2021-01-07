@@ -87,26 +87,25 @@ gl.vertexAttribPointer(
 gl.enableVertexAttribArray(attribLocations["a_UVCoords"]);
 
 // Textures
-const texture = buildTexture();
-// gl.activeTexture(gl.TEXTURE0 + 0);
+gl.activeTexture(gl.TEXTURE0 + 0);
+const texture = buildTexture(32);
+gl.activeTexture(gl.TEXTURE0 + 1);
+const texture2 = buildTexture(16);
+// gl.bindTexture(gl.TEXTURE_2D, texture);
 
 // uniform
 // gl.uniform1i(uniformLocations.u_Textures, 0);
+gl.uniform1i(uniformLocations.u_Textures, 0); //!@#!@#!@# change laters
 
 // drawArrays
 setTimeout(() => {
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.drawArrays(gl.POINTS, 0, data.length / 4);
-    // gl.drawArrays(gl.TRIANGLES, 0, data.length / 4);
-}, 1000);
+    gl.drawArrays(gl.TRIANGLES, 0, data.length / 4);
+}, 0);
 
 // FUNCTIONS
-// console.log(gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS));
-
-// gl.texImage2D;
-// gl.texParameteri(gl.TEXTURE_2D, gl.texture);
-
-async function buildTexture() {
+async function buildTexture(inputWidth: number) {
     try {
         const texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -117,7 +116,7 @@ async function buildTexture() {
         } else {
             const level = 0;
             const internalFormat = gl.RGBA;
-            const width = 4;
+            const width = inputWidth;
             const height = 1;
             const border = 0;
             const srcFormat = gl.RGBA;
@@ -155,11 +154,6 @@ function createTexData(numOfSteps: number = 2) {
         tex.push(255, 0, 0, 255 * (i / numOfSteps - 1));
         // tex.push(255, 0, 0, 255);
     }
-    // for (let i = 255; i >= 0; i = i - 255 / (numOfSteps - 2)) {
-    //     console.log("i", i);
-    //     tex.push(255, 0, 0, i);
-    // }
-    // console.log(tex.length);
     tex.push(255, 0, 0, 255);
 
     return tex;

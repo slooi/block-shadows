@@ -5,7 +5,6 @@
 	precision mediump float;
 #endif
 
-//#define numTextures 1
 
 precision mediump float;
 
