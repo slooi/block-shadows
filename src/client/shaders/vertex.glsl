@@ -4,13 +4,13 @@
 	precision mediump float;
 #endif
 
-attribute vec2 a_VertexPosition;
-attribute vec2 a_UVCoords;
-varying vec2 v_UVCoords;
+attribute highp vec2 a_BlockPos;
+attribute float a_BlockIndex;
+varying float v_BlockIndex;
 
 void main(){
-	v_UVCoords = a_UVCoords;
+	v_BlockIndex = a_BlockIndex;
 
 	gl_PointSize = 16.0;
-	gl_Position = vec4(a_VertexPosition,0,1);
+	gl_Position = vec4(a_BlockPos,0,1);
 }

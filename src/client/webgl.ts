@@ -10,7 +10,15 @@ const canvas = document.getElementById("canvas")! as HTMLCanvasElement;
 let gl = canvas.getContext("webgl", { premultipliedAlpha: false, antialias: true })
     ? <WebGLRenderingContext>canvas.getContext("webgl")
     : (canvas.getContext("experimental-webgl") as WebGLRenderingContext);
+var ext = gl.getExtension("OES_element_index_uint");
+if (!ext) {
+    throw new Error(
+        `ERROR: gl.getExtension('OES_element_index_uint') not supported! Lol wut, everything should support it`
+    );
+}
 let textureAtlas: HTMLImageElement;
+
+const arrayBuffer = gl.createBuffer();
 
 setup();
 
@@ -63,39 +71,40 @@ function webglSetup() {
     // Data
     // prettier-ignore
     const data = [
-	//	x	y			u		v
-		0,	0,			0,		0,
-		0.5,	0,		1,		1,
-		0.5,	0.5,		1,		1
+	//	x	y			index
+		0.5,	0.5,		0,	
+		0.8,	0,		1,
+		0.5,	0.5,		0,	
+		0.8,	0,		1,
 	]
 
     // Buffer
-    const arrayBuffer = gl.createBuffer();
+    // const arrayBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, arrayBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
 
     // pointer
     // Vertex Positions
     gl.vertexAttribPointer(
-        attribLocations["a_VertexPosition"],
+        attribLocations["a_BlockPos"],
         2,
-        gl.FLOAT,
+        gl.FLOAT, //????
         false,
-        Float32Array.BYTES_PER_ELEMENT * 4,
+        Float32Array.BYTES_PER_ELEMENT * 3,
         Float32Array.BYTES_PER_ELEMENT * 0
     );
-    gl.enableVertexAttribArray(attribLocations["a_VertexPosition"]);
+    gl.enableVertexAttribArray(attribLocations["a_BlockPos"]);
 
     // UV Coords
     gl.vertexAttribPointer(
-        attribLocations["a_UVCoords"],
-        2,
+        attribLocations["a_BlockIndex"],
+        1,
         gl.FLOAT,
         false,
-        Float32Array.BYTES_PER_ELEMENT * 4,
+        Float32Array.BYTES_PER_ELEMENT * 3,
         Float32Array.BYTES_PER_ELEMENT * 2
     );
-    gl.enableVertexAttribArray(attribLocations["a_UVCoords"]);
+    gl.enableVertexAttribArray(attribLocations["a_BlockIndex"]);
 
     // Textures
     gl.activeTexture(gl.TEXTURE0 + 0);
@@ -108,11 +117,24 @@ function webglSetup() {
 
     // drawArrays
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.POINTS, 0, data.length / 4);
-    gl.drawArrays(gl.TRIANGLES, 0, data.length / 4);
+    gl.drawArrays(gl.POINTS, 0, data.length / 3);
+    // gl.drawArrays(gl.TRIANGLES, 0, data.length / 3);
 }
 
 // FUNCTIONS
+function bufferData(data: Array<number>) {
+    gl.bindBuffer(gl.ARRAY_BUFFER, arrayBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+}
+
+function clear() {
+    gl.clear(gl.COLOR_BUFFER_BIT);
+}
+
+function render(data: Array<number>) {
+    gl.drawArrays(gl.POINTS, 0, data.length / 3);
+}
+
 async function buildTexture(inputWidth: number) {
     try {
         const texture = gl.createTexture();
