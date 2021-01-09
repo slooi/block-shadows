@@ -52,4 +52,7 @@ module.exports = {
             template: path.resolve(__dirname, "src", "client", "index.html"),
         }),
     ],
+    resolve: {
+        extensions: [".ts", ".js", ".json"],
+    },
 };

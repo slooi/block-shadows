@@ -18,7 +18,10 @@ if (!ext) {
 }
 let textureAtlas: HTMLImageElement;
 
+// Exposing and setup of webgl components
 const arrayBuffer = gl.createBuffer();
+const attribLocations: { [key: string]: number } = {};
+const uniformLocations: { [key: string]: WebGLUniformLocation | null } = {};
 
 setup();
 
@@ -46,7 +49,6 @@ function webglSetup() {
 
     // locations
     // attribute
-    const attribLocations: { [key: string]: number } = {};
     for (let i = 0; i < gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES); i++) {
         try {
             const attribName = gl.getActiveAttrib(program, i)!.name;
@@ -58,7 +60,6 @@ function webglSetup() {
 
     // locations
     // uniforms
-    const uniformLocations: { [key: string]: WebGLUniformLocation | null } = {};
     for (let i = 0; i < gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS); i++) {
         try {
             const uniformName = gl.getActiveUniform(program, i)!.name;
@@ -80,8 +81,9 @@ function webglSetup() {
 
     // Buffer
     // const arrayBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, arrayBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+    // gl.bindBuffer(gl.ARRAY_BUFFER, arrayBuffer);
+    // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+    bufferData(data);
 
     // pointer
     // Vertex Positions
@@ -112,13 +114,11 @@ function webglSetup() {
     // gl.bindTexture(gl.TEXTURE_2D, texture);
 
     // uniform
-    // gl.uniform1i(uniformLocations.u_Textures, 0);
-    gl.uniform1i(uniformLocations.u_Textures, 0); //!@#!@#!@# change laters
+    gl.uniform1i(uniformLocations.u_Textures, 0);
 
     // drawArrays
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.drawArrays(gl.POINTS, 0, data.length / 3);
-    // gl.drawArrays(gl.TRIANGLES, 0, data.length / 3);
+    clear();
+    render(data);
 }
 
 // FUNCTIONS
@@ -240,7 +240,16 @@ function buildProgram() {
     }
 }
 
+// export type setup = () => void;
+// export type bufferData = () => void;
+// export type clear = () => void;
+// export type render = () => void;
+// export { setup, bufferData, clear, render };
+// module.exports = { setup, bufferData, clear, render };
+// const functions = { setup, bufferData, clear, render };
+// export default functions;
 /*
 param
+
 
 **/
