@@ -13,7 +13,7 @@ A place to brainstorm ideas
     -   image renderer
     -   changes renderer
 
-### Renderer Specification
+### Renderer Specification (currently MVP renderer)
 
 -   [ ] can move blocks (left right up down)
 -   [ ] can create shadows
