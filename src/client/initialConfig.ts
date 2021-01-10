@@ -1,7 +1,7 @@
 const initalConfig = {
     blockDia: 16,
     mapDimensions: {
-        wdith: 400,
+        width: 400,
         height: 400,
     },
 };

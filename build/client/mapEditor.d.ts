@@ -1,1 +1,1 @@
-declare const canvas: HTMLElement;
+export {};

@@ -18,7 +18,8 @@
     },
     "scripts": {
         "startO": "tsc-watch",
-        "start": "npm-run-all --parallel watch:clientall auto:server ",
+        "startAuto": "npm-run-all --parallel watch:clientall auto:server ",
+        "start": "npm-run-all --parallel watch:client auto:server ",
         "watch:clientall": "npm-run-all --parallel watch:client watch",
         "watch:client": "webpack serve --mode development --config client.common.js",
         "build:client": "webpack --mode development --config client.production.js",
