@@ -19,10 +19,12 @@ function createRenderer() {
     }
     let textureAtlas: HTMLImageElement;
 
-    // Exposing and setup of webgl components
+    // Exposing and setup of webgl components and variables
     const arrayBuffer = gl.createBuffer();
     const attribLocations: { [key: string]: number } = {};
     const uniformLocations: { [key: string]: WebGLUniformLocation | null } = {};
+
+    const data: number[] = [];
 
     // Setup
     setup();
@@ -73,13 +75,13 @@ function createRenderer() {
 
         // Data
         // prettier-ignore
-        const data = [
+        data.push( ...[
 		//	x	y			index
 			0.5,	0.5,		0,	
 			0.8,	0,		1,
 			0.5,	0.5,		0,	
 			0.8,	0,		1,
-		]
+		])
 
         // Buffer
         // const arrayBuffer = gl.createBuffer();
@@ -117,6 +119,8 @@ function createRenderer() {
 
         // uniform
         gl.uniform1i(uniformLocations.u_Textures, 0);
+        gl.uniform1f(uniformLocations.u_BlockDia, 16);
+        gl.uniform1f(uniformLocations.u_NumOfBlocks, 5);
 
         // drawArrays
         clear();

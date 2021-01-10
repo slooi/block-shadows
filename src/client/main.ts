@@ -1,13 +1,11 @@
 import createRenderer from "./webgl";
+// import createMapEditor from "./mapEditor";
+import initialConfig from "./initialConfig";
 
+console.log(initialConfig);
 const renderer = createRenderer();
+// const mapEditor = createMapEditor(initialConfig);
 console.log("main.ts");
-
-const canvas = document.getElementById("canvas")!;
-
-canvas.addEventListener("mousedown", (e) => {
-    console.log(e.offsetX);
-});
 
 // render();/
 // setup();
