@@ -7,7 +7,7 @@ import fsSource from "./shaders/fragment.glsl";
 // Canvas & gl
 const canvas = document.getElementById("canvas")! as HTMLCanvasElement;
 
-function createRenderer() {
+async function createRenderer() {
     let gl = canvas.getContext("webgl", { premultipliedAlpha: false, antialias: true })
         ? <WebGLRenderingContext>canvas.getContext("webgl")
         : (canvas.getContext("experimental-webgl") as WebGLRenderingContext);
@@ -76,12 +76,12 @@ function createRenderer() {
         // Data
         // prettier-ignore
         data.push( ...[
-		//	x	y			index
-			0.5,	0.5,		0,	
-			0.8,	0,		1,
-			0.5,	0.5,		0,	
-			0.8,	0,		1,
-		])
+			//	x	y			index
+				0.5,	0.5,		0,	
+				0.8,	0,		1,
+				0.5,	0.5,		0,	
+				0.8,	0,		1,
+			])
 
         // Buffer
         // const arrayBuffer = gl.createBuffer();
@@ -121,13 +121,30 @@ function createRenderer() {
         gl.uniform1i(uniformLocations.u_Textures, 0);
         gl.uniform1f(uniformLocations.u_BlockDia, 16);
         gl.uniform1f(uniformLocations.u_NumOfBlocks, 5);
+        gl.uniform1fv(uniformLocations.u_CamPos, [0, 0]);
 
         // drawArrays
         clear();
-        render(data);
+        render();
     }
 
+    // TYPES
+    type TypeUpdatedUniforms = {
+        u_BlockDia?: number;
+        u_NumOfBlocks?: number;
+        u_CamPos?: [number, number];
+    };
+
     // FUNCTIONS
+    function updateUniform(updatedUniforms: TypeUpdatedUniforms) {
+        if (updatedUniforms.u_BlockDia !== undefined)
+            gl.uniform1f(uniformLocations.u_BlockDia, updatedUniforms.u_BlockDia);
+        if (updatedUniforms.u_NumOfBlocks !== undefined)
+            gl.uniform1f(uniformLocations.u_NumOfBlocks, 5);
+        if (updatedUniforms.u_CamPos !== undefined)
+            gl.uniform1fv(uniformLocations.u_CamPos, [0, 0]);
+    }
+
     function bufferData(data: Array<number>) {
         gl.bindBuffer(gl.ARRAY_BUFFER, arrayBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
@@ -137,7 +154,7 @@ function createRenderer() {
         gl.clear(gl.COLOR_BUFFER_BIT);
     }
 
-    function render(data: Array<number>) {
+    function render() {
         gl.drawArrays(gl.POINTS, 0, data.length / 3);
     }
 
@@ -250,6 +267,7 @@ function createRenderer() {
         bufferData,
         clear,
         render,
+        updateUniform,
     };
 }
 

@@ -8,7 +8,11 @@ This is documentation for myself of information I have learnt from this project.
     -   Solution: Restart the webpack serve
 -   Webpack:
     -   Accidentally tried getting position of v_BlockPos instead of a_BlockPos
+-   Can't access typescript variables in the console browser
 
 ## Lessons
+
+-   ReturnType<typeof createRenderer>
+-   config: typeof initialConfig
 
 ## Notes
