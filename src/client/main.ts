@@ -1,16 +1,24 @@
 import createRenderer from "./webgl";
 import createMapEditor from "./mapEditor";
 import initialConfig from "./initialConfig";
+import { Game } from "./Game";
 
-// setup();
+/* 
+Purpose:
+- entry point
+- loads 100% required resources
+*/
+
+setup();
 
 async function setup() {
-    console.log(initialConfig);
-    const renderer = await createRenderer();
-    const map = createMap();
-    const mapEditor = createMapEditor(initialConfig, map);
-
-    start(renderer);
+    const game = new Game();
+    // const tilemap = await loadImage();
+    // console.log(initialConfig);
+    // const renderer = await createRenderer();
+    // const map = createMap();
+    // const mapEditor = createMapEditor(initialConfig, map);
+    // start(renderer);
 }
 
 function start(renderer: RendererType) {

@@ -1,7 +1,7 @@
 declare const initalConfig: {
     blockDia: number;
     mapDimensions: {
-        wdith: number;
+        width: number;
         height: number;
     };
 };

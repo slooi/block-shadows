@@ -1,5 +1,7 @@
 console.log("webgl.ts");
 
+import tilemap from "../assets/tilemap.png";
+
 // SHADERS
 import vsSource from "./shaders/vertex.glsl";
 import fsSource from "./shaders/fragment.glsl";
@@ -7,7 +9,7 @@ import fsSource from "./shaders/fragment.glsl";
 // Canvas & gl
 const canvas = document.getElementById("canvas")! as HTMLCanvasElement;
 
-async function createRenderer() {
+function createRenderer() {
     let gl = canvas.getContext("webgl", { premultipliedAlpha: false, antialias: true })
         ? <WebGLRenderingContext>canvas.getContext("webgl")
         : (canvas.getContext("experimental-webgl") as WebGLRenderingContext);
@@ -31,7 +33,7 @@ async function createRenderer() {
 
     async function setup() {
         console.log("Loading textureAtlas");
-        textureAtlas = await loadImage();
+        textureAtlas = createImage(); // createImage(); //!@#!@#!@#
         console.log("Running webgl setup");
         webglSetup();
     }
@@ -223,6 +225,20 @@ async function createRenderer() {
                 reject(err);
             };
         });
+    }
+
+    function createImage() {
+        const img = new Image();
+        img.src = tilemap;
+        img.addEventListener("error", (e) => {
+            console.log(e);
+        });
+        img.addEventListener("load", (e) => {
+            console.log(e);
+        });
+        console.log(tilemap);
+        console.log("DONE");
+        return img;
     }
 
     // build shader

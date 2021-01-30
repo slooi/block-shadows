@@ -45,6 +45,17 @@ module.exports = {
                 test: /\.(glsl|vs|fs)$/,
                 loader: "ts-shader-loader",
             },
+            {
+                test: /\.(png|jpg|gif)$/i,
+                use: [
+                    {
+                        loader: "url-loader",
+                        options: {
+                            limit: 16384, // in bytes
+                        },
+                    },
+                ],
+            },
         ],
     },
     plugins: [
