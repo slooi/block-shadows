@@ -10,18 +10,25 @@ import { Camera } from "./Camera";
 import initialConfig from "./initialConfig";
 import createRenderer from "./webgl";
 import createMapEditor from "./mapEditor";
+import Player from "./Player";
+import { InputHandlerType } from "./importTypes";
 
-export class Game {
+export default class Game {
     camera: Camera;
     canvas: HTMLCanvasElement;
     renderer: RendererType;
+    player: Player;
 
-    constructor() {
+    constructor(inputHandler: InputHandlerType) {
         // Setup up
-        this.canvas = document.getElementById("canvas")! as HTMLCanvasElement;
+        // Player
+        this.player = new Player(inputHandler, 0, 0);
 
+        // camera
+        this.canvas = document.getElementById("canvas")! as HTMLCanvasElement;
         this.camera = new Camera(0, 0, this.canvas.width, this.canvas.height);
 
+        // Renderer
         this.renderer = createRenderer();
         // const map = createMap();
         // const mapEditor = createMapEditor(initialConfig, map);
@@ -29,11 +36,26 @@ export class Game {
 
     async downloadMap() {
         // ASYNC
+        return;
     }
 
     loop() {
         // Game loop
+
+        // Player
+        this.player.updatePos();
+
+        // Renderer
+        this.renderer.clear();
+        this.renderer.render();
+        this.renderer.updateUniform({ u_CamPos: this.player.getPos() });
+
+        requestAnimationFrame(this.loop);
     }
+}
+
+async function downloadMap() {
+    return [];
 }
 
 // async function setup() {

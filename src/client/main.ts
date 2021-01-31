@@ -1,7 +1,8 @@
 import createRenderer from "./webgl";
 import createMapEditor from "./mapEditor";
 import initialConfig from "./initialConfig";
-import { Game } from "./Game";
+import Game from "./Game";
+import createInputHandler from "./createInputHandler";
 
 /* 
 Purpose:
@@ -10,9 +11,10 @@ Purpose:
 */
 
 setup();
-
+console.log("wa");
+const inputHandler = createInputHandler();
 async function setup() {
-    const game = new Game();
+    const game = new Game(inputHandler);
     // const tilemap = await loadImage();
     // console.log(initialConfig);
     // const renderer = await createRenderer();
@@ -21,17 +23,17 @@ async function setup() {
     // start(renderer);
 }
 
-function start(renderer: RendererType) {
-    renderer.updateUniform({ u_CamPos: [0, 1] });
-    renderer.render();
-}
+// function start(renderer: RendererType) {
+//     renderer.updateUniform({ u_CamPos: [0, 1] });
+//     renderer.render();
+// }
 
-function createMap() {
-    const height = initialConfig.mapDimensions.height;
-    const width = initialConfig.mapDimensions.width;
-    const map = new Array(height).fill(0).map((i) => new Array(width).fill(0));
-    return map;
-}
+// function createMap() {
+//     const height = initialConfig.mapDimensions.height;
+//     const width = initialConfig.mapDimensions.width;
+//     const map = new Array(height).fill(0).map((i) => new Array(width).fill(0));
+//     return map;
+// }
 
 // async function start2() {
 //     const renderer = await crenderer();

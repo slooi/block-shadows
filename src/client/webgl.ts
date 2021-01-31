@@ -79,11 +79,10 @@ function createRenderer() {
         // prettier-ignore
         data.push( ...[
 			//	x	y			index
-				0.5,	0.5,		0,	
-				0.8,	0,		1,
-				0.5,	0.5,		0,	
-				0.8,	0,		1,
-			])
+			0.5,	0.5,		0,	
+			0.8,	0,		1,
+			0,	0,		2,
+		])
 
         // Buffer
         // const arrayBuffer = gl.createBuffer();
@@ -123,7 +122,7 @@ function createRenderer() {
         gl.uniform1i(uniformLocations.u_Textures, 0);
         gl.uniform1f(uniformLocations.u_BlockDia, 16);
         gl.uniform1f(uniformLocations.u_NumOfBlocks, 5);
-        gl.uniform1fv(uniformLocations.u_CamPos, [0, 0]);
+        gl.uniform2fv(uniformLocations.u_CamPos, [0, 0]);
 
         // drawArrays
         clear();
@@ -133,7 +132,6 @@ function createRenderer() {
     // TYPES
     type TypeUpdatedUniforms = {
         u_BlockDia?: number;
-        u_NumOfBlocks?: number;
         u_CamPos?: [number, number];
     };
 
@@ -141,10 +139,8 @@ function createRenderer() {
     function updateUniform(updatedUniforms: TypeUpdatedUniforms) {
         if (updatedUniforms.u_BlockDia !== undefined)
             gl.uniform1f(uniformLocations.u_BlockDia, updatedUniforms.u_BlockDia);
-        if (updatedUniforms.u_NumOfBlocks !== undefined)
-            gl.uniform1f(uniformLocations.u_NumOfBlocks, 5);
         if (updatedUniforms.u_CamPos !== undefined)
-            gl.uniform1fv(uniformLocations.u_CamPos, [0, 0]);
+            gl.uniform2fv(uniformLocations.u_CamPos, updatedUniforms.u_CamPos);
     }
 
     function bufferData(data: Array<number>) {
