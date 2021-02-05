@@ -1,10 +1,15 @@
 import { Camera } from "./Camera";
 import createRenderer from "./webgl";
-export declare class Game {
+import Player from "./Player";
+import { InputHandlerType } from "./importTypes";
+import Map from "./Map";
+export default class Game {
     camera: Camera;
     canvas: HTMLCanvasElement;
     renderer: RendererType;
-    constructor();
+    player: Player;
+    map: Map;
+    constructor(inputHandler: InputHandlerType);
     downloadMap(): Promise<void>;
     loop(): void;
 }

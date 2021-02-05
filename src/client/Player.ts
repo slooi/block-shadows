@@ -13,7 +13,7 @@ export default class Player {
         this.inputHandler = inputHandler;
         this.x = x;
         this.y = y;
-        this.speed = 1;
+        this.speed = 5;
         this.xVel = 0;
         this.yVel = 0;
     }
@@ -31,6 +31,7 @@ export default class Player {
         if (this.inputHandler.keyDown("d")) {
             this.x += this.speed;
         }
+        // console.log(this.x, this.y);
     }
 
     getPos(): [number, number] {

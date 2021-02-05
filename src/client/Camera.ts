@@ -18,7 +18,7 @@ export class Camera {
         this.w = w;
         this.h = h;
         this.target = 0;
-        this.lag = 1;
+        this.lag = 0.01;
     }
 
     setTarget(target: TargetType) {
@@ -27,6 +27,7 @@ export class Camera {
 
     update() {
         if (this.target !== 0) {
+            console.log(this.x);
             this.x = (this.target.x - this.x) * this.lag;
             this.y = (this.target.y - this.y) * this.lag;
         }
@@ -35,5 +36,9 @@ export class Camera {
     getDetails(): [number, number, number, number] {
         // Returns camera x, y, width, height
         return [this.x, this.y, this.w, this.h];
+    }
+
+    getPos(): [number, number] {
+        return [this.x, this.y];
     }
 }

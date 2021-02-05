@@ -4,16 +4,14 @@ import initialConfig from "./initialConfig";
 import Game from "./Game";
 import createInputHandler from "./createInputHandler";
 
-/* 
-Purpose:
-- entry point
-- loads 100% required resources
-*/
+import "./styles.css";
 
 setup();
-console.log("wa");
-const inputHandler = createInputHandler();
+
 async function setup() {
+    const inputHandler = createInputHandler();
+    console.log("inputHandler");
+    console.log(inputHandler);
     const game = new Game(inputHandler);
     // const tilemap = await loadImage();
     // console.log(initialConfig);

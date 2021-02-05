@@ -12,24 +12,39 @@ import createRenderer from "./webgl";
 import createMapEditor from "./mapEditor";
 import Player from "./Player";
 import { InputHandlerType } from "./importTypes";
+import Map from "./Map";
 
 export default class Game {
     camera: Camera;
     canvas: HTMLCanvasElement;
-    renderer: RendererType;
+    renderer!: RendererType;
     player: Player;
+    map: Map;
 
     constructor(inputHandler: InputHandlerType) {
         // Setup up
+        this.map = new Map();
+
         // Player
+        console.log("inputHandler", inputHandler);
         this.player = new Player(inputHandler, 0, 0);
 
         // camera
         this.canvas = document.getElementById("canvas")! as HTMLCanvasElement;
         this.camera = new Camera(0, 0, this.canvas.width, this.canvas.height);
+        this.camera.setTarget(this.player);
 
         // Renderer
-        this.renderer = createRenderer();
+        createRenderer().then((renderer) => {
+            this.renderer = renderer;
+            console.log("buffer Data");
+            this.renderer.bufferData(this.map.getMapData1D());
+            console.log("buffer Data END");
+
+            setTimeout(() => {
+                this.loop();
+            }, 0);
+        });
         // const map = createMap();
         // const mapEditor = createMapEditor(initialConfig, map);
     }
@@ -40,17 +55,24 @@ export default class Game {
     }
 
     loop() {
-        // Game loop
+        const frame = () => {
+            // Game loop
 
-        // Player
-        this.player.updatePos();
+            // Player
+            this.player.updatePos();
 
-        // Renderer
-        this.renderer.clear();
-        this.renderer.render();
-        this.renderer.updateUniform({ u_CamPos: this.player.getPos() });
+            // Camera
+            this.camera.update();
 
-        requestAnimationFrame(this.loop);
+            // Renderer
+            this.renderer.clear();
+            this.renderer.updateUniform({ u_CamPos: this.player.getPos() }); //!@#!@#!@# change later
+            this.renderer.render();
+            // console.log("Render");
+
+            requestAnimationFrame(frame);
+        };
+        frame();
     }
 }
 

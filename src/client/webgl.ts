@@ -1,6 +1,7 @@
 console.log("webgl.ts");
 
 import tilemap from "../assets/tilemap.png";
+import initalConfig from "./initialConfig";
 
 // SHADERS
 import vsSource from "./shaders/vertex.glsl";
@@ -9,8 +10,8 @@ import fsSource from "./shaders/fragment.glsl";
 // Canvas & gl
 const canvas = document.getElementById("canvas")! as HTMLCanvasElement;
 
-function createRenderer() {
-    let gl = canvas.getContext("webgl", { premultipliedAlpha: false, antialias: true })
+async function createRenderer() {
+    let gl = canvas.getContext("webgl", { premultipliedAlpha: false, antialias: false })
         ? <WebGLRenderingContext>canvas.getContext("webgl")
         : (canvas.getContext("experimental-webgl") as WebGLRenderingContext);
     var ext = gl.getExtension("OES_element_index_uint");
@@ -26,17 +27,16 @@ function createRenderer() {
     const attribLocations: { [key: string]: number } = {};
     const uniformLocations: { [key: string]: WebGLUniformLocation | null } = {};
 
-    const data: number[] = [];
+    let data: number[] = [];
+
+    // setup variables
+    const oldUniforms: UniformsType = {
+        u_BlockDia: 16,
+        u_CamPos: [0, 0],
+        u_GameWindow: [400, 400],
+    };
 
     // Setup
-    setup();
-
-    async function setup() {
-        console.log("Loading textureAtlas");
-        textureAtlas = createImage(); // createImage(); //!@#!@#!@#
-        console.log("Running webgl setup");
-        webglSetup();
-    }
 
     function webglSetup() {
         // Setup
@@ -79,9 +79,12 @@ function createRenderer() {
         // prettier-ignore
         data.push( ...[
 			//	x	y			index
-			0.5,	0.5,		0,	
-			0.8,	0,		1,
-			0,	0,		2,
+			0,	0,		0,	
+			1,	0,		1,
+			1,	1,		2,
+			1,	2,		2,
+			1,	3,		2,
+			1,	4,		2,
 		])
 
         // Buffer
@@ -89,6 +92,7 @@ function createRenderer() {
         // gl.bindBuffer(gl.ARRAY_BUFFER, arrayBuffer);
         // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
         bufferData(data);
+        console.log("koi");
 
         // pointer
         // Vertex Positions
@@ -119,33 +123,62 @@ function createRenderer() {
         // gl.bindTexture(gl.TEXTURE_2D, texture);
 
         // uniform
+        //CONSTANT
         gl.uniform1i(uniformLocations.u_Textures, 0);
-        gl.uniform1f(uniformLocations.u_BlockDia, 16);
-        gl.uniform1f(uniformLocations.u_NumOfBlocks, 5);
-        gl.uniform2fv(uniformLocations.u_CamPos, [0, 0]);
-
+        gl.uniform1f(uniformLocations.u_NumOfBlocks, initalConfig.numOfBlocks);
+        //
+        // gl.uniform1f(uniformLocations.u_BlockDia, 16);
+        // gl.uniform2fv(uniformLocations.u_CamPos, [0, 0]);
+        updateUniform(oldUniforms);
         // drawArrays
         clear();
         render();
     }
 
     // TYPES
-    type TypeUpdatedUniforms = {
+    type UniformsType = {
         u_BlockDia?: number;
         u_CamPos?: [number, number];
+        u_GameWindow?: [number, number];
     };
 
     // FUNCTIONS
-    function updateUniform(updatedUniforms: TypeUpdatedUniforms) {
+    function updateUniform(updatedUniforms: UniformsType) {
+        // Update old uniforms
         if (updatedUniforms.u_BlockDia !== undefined)
             gl.uniform1f(uniformLocations.u_BlockDia, updatedUniforms.u_BlockDia);
         if (updatedUniforms.u_CamPos !== undefined)
-            gl.uniform2fv(uniformLocations.u_CamPos, updatedUniforms.u_CamPos);
+            gl.uniform2fv(uniformLocations.u_CamPos, [
+                updatedUniforms.u_CamPos[0],
+                -updatedUniforms.u_CamPos[1],
+            ]);
+
+        if (updatedUniforms.u_GameWindow !== undefined) {
+            gl.uniform2fv(uniformLocations.u_GameWindow, [400, 400]);
+        }
+
+        // Update old uniforms
+        // setOldUniforms(updatedUniforms);
     }
 
-    function bufferData(data: Array<number>) {
+    function setOldUniforms(updatedUniforms: UniformsType) {
+        // Deep copy of updatedUniforms
+        const tempUniforms: UniformsType = JSON.parse(JSON.stringify(updatedUniforms));
+
+        // Update oldUniforms using the deep copy
+        (Object.keys(tempUniforms) as Array<keyof UniformsType>).forEach(
+            <K extends keyof UniformsType>(key: K) => {
+                oldUniforms[key] = tempUniforms[key];
+            }
+        );
+    }
+
+    function bufferData(data2: Array<number>) {
+        console.log(data2);
+        console.log("bufferData !@#");
+        data = data2;
         gl.bindBuffer(gl.ARRAY_BUFFER, arrayBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data2), gl.STATIC_DRAW);
     }
 
     function clear() {
@@ -162,8 +195,7 @@ function createRenderer() {
             gl.bindTexture(gl.TEXTURE_2D, texture);
 
             if (1) {
-                const img = textureAtlas;
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureAtlas);
             } else {
                 const level = 0;
                 const internalFormat = gl.RGBA;
@@ -213,28 +245,15 @@ function createRenderer() {
     function loadImage() {
         return new Promise<HTMLImageElement>((resolve, reject) => {
             const img = new Image();
-            img.src = "./tilemap.png";
-            img.onload = function () {
+            img.src = tilemap;
+            img.addEventListener("error", (e) => {
+                console.log(e);
+            });
+            img.addEventListener("load", (e) => {
+                console.log("Loaded TextureAtlas");
                 resolve(img);
-            };
-            img.onerror = function (err) {
-                reject(err);
-            };
+            });
         });
-    }
-
-    function createImage() {
-        const img = new Image();
-        img.src = tilemap;
-        img.addEventListener("error", (e) => {
-            console.log(e);
-        });
-        img.addEventListener("load", (e) => {
-            console.log(e);
-        });
-        console.log(tilemap);
-        console.log("DONE");
-        return img;
     }
 
     // build shader
@@ -275,12 +294,19 @@ function createRenderer() {
         }
     }
 
-    return {
-        bufferData,
-        clear,
-        render,
-        updateUniform,
-    };
+    console.log("Loading textureAtlas");
+    // textureAtlas = await loadImage();
+    return loadImage().then((img) => {
+        textureAtlas = img;
+        webglSetup();
+        console.log("Running webgl setup");
+        return {
+            bufferData,
+            clear,
+            render,
+            updateUniform,
+        };
+    });
 }
 
 // export type setup = () => void;

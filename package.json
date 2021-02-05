@@ -30,7 +30,10 @@
         "gen": "dts-bundle-generator -o src/client/initialConfig.d.ts ./src/client/initialConfig.ts",
         "watch": "npm-watch",
         "test": "npm run gen"
-    },
+	},
+	"scriptComments":{
+
+	},
     "author": "",
     "license": "ISC",
     "devDependencies": {

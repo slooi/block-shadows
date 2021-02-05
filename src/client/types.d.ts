@@ -8,6 +8,7 @@ declare module "*.glsl" {
 // }
 
 declare module "*.png";
+declare module "*.css";
 
 type KeyDownType =
     | "`"
