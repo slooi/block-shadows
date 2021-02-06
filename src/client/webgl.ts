@@ -1,7 +1,5 @@
 console.log("webgl.ts");
 
-import initalConfig from "./initialConfig";
-
 // Images
 import tilemap from "../assets/tilemap.png";
 import lightAtlas from "../assets/lightAtlas.png";
@@ -9,6 +7,7 @@ import lightAtlas from "../assets/lightAtlas.png";
 // SHADERS
 import vsSource from "./shaders/vertex.glsl";
 import fsSource from "./shaders/fragment.glsl";
+import initialConfig from "./initialConfig";
 
 // Canvas & gl
 const canvas = document.getElementById("canvas")! as HTMLCanvasElement;
@@ -34,9 +33,9 @@ async function createRenderer() {
 
     // setup variables
     const oldUniforms: UniformsType = {
-        u_BlockDia: initalConfig.blockDia,
+        u_BlockDia: initialConfig.blockDia,
         u_CamPos: [0, 0],
-        u_GameWindow: [initalConfig.gameWindow.width, initalConfig.gameWindow.height],
+        u_GameWindow: [initialConfig.gameWindow.width, initialConfig.gameWindow.height],
     };
 
     const lenRef: number[] = [];
@@ -45,7 +44,7 @@ async function createRenderer() {
 
     function webglSetup() {
         // Setup
-        gl.viewport(0, 0, initalConfig.gameWindow.width, initalConfig.gameWindow.height);
+        gl.viewport(0, 0, initialConfig.gameWindow.width, initialConfig.gameWindow.height);
         gl.clearColor(0, 0, 1, 1);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         gl.enable(gl.BLEND);
@@ -131,7 +130,7 @@ async function createRenderer() {
         // uniform
         //CONSTANT
         gl.uniform1i(uniformLocations.u_Textures, 0);
-        gl.uniform1f(uniformLocations.u_NumOfBlocks, initalConfig.numOfBlocks);
+        gl.uniform1f(uniformLocations.u_NumOfBlocks, initialConfig.numOfBlocks);
         gl.uniform1f(uniformLocations.u_Off, 1 / 32 + 1 / 32 / 2 + 1 / 32 / 4 + 1 / 32 / 8);
         //
         // gl.uniform1f(uniformLocations.u_BlockDia, 16);
@@ -194,11 +193,13 @@ async function createRenderer() {
     function bufferData(data: Array<number>) {
         const mapData: number[] = [];
         for (let i = 0; i < data.length; i++) {
-            const x = i % initalConfig.mapDia;
-            const y = Math.floor(i / initalConfig.mapDia);
+            const x = i % initialConfig.mapDia;
+            const y = Math.floor(i / initialConfig.mapDia);
             mapData.push(x, y, data[i]);
         }
         lenRef[0] = mapData.length;
+        // buildCustomTexture(data); //!@#!@#!@#!@#!#!#!#!@#!@# change later
+
         // gl.bindBuffer(gl.ARRAY_BUFFER, arrayBuffer);	// No need to constantly bind
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mapData), gl.STATIC_DRAW); // INEFFICIENT AS REPLACES WHOLE THING
     }
@@ -237,20 +238,22 @@ async function createRenderer() {
         }
     }
 
-    function buildCustomTexture(inputWidth: number) {
+    function blockIdsToLightInfo(blockIdList: number[]) {}
+
+    function buildCustomTexture(blockIdList: number[]) {
         try {
             const texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, texture);
 
             const level = 0;
             const internalFormat = gl.RGBA;
-            const width = inputWidth;
+            const width = initialConfig.mapDia;
             const height = 1;
             const border = 0;
             const srcFormat = gl.RGBA;
             const srcType = gl.UNSIGNED_BYTE;
             //prettier-ignore
-            const pixel = new Uint8Array(createTexData(width)); // opaque blue
+            const pixel = new Uint8Array([]); // opaque blue
             gl.texImage2D(
                 gl.TEXTURE_2D,
                 level,
@@ -266,10 +269,10 @@ async function createRenderer() {
             gl.generateMipmap(gl.TEXTURE_2D);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
             // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
             // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST_MIPMAP_NEAREST);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
 
             return texture;
         } catch (err) {
