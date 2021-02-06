@@ -25,7 +25,11 @@ export default function createInputHandler() {
         state.mousePos.x = e.offsetX;
         state.mousePos.y = e.offsetY;
     });
-    window.addEventListener("mousedown", (e) => (state.mouseDown = true));
+    window.addEventListener("mousedown", (e) => {
+        state.mousePos.x = e.offsetX;
+        state.mousePos.y = e.offsetY;
+        state.mouseDown = true;
+    });
     window.addEventListener("mouseup", (e) => (state.mouseDown = false));
 
     // FUNCTIONS

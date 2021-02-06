@@ -214,7 +214,6 @@ async function createRenderer() {
     }
 
     function render() {
-        console.log("length", lenRef[0]);
         gl.drawArrays(gl.POINTS, 0, lenRef[0] / 3);
     }
 
