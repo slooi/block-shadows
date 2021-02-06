@@ -44,15 +44,21 @@ export default class Game {
         createRenderer().then((renderer) => {
             this.renderer = renderer;
             console.log("buffer Data");
-            this.renderer.bufferData(this.map.getMapData1D());
+
+            // Add map data to renderer
+            const mapData = this.map.getMapData();
+            this.renderer.bufferData(mapData);
             console.log("buffer Data END");
 
             setTimeout(() => {
+                let test = 0;
+                if (test === 1) {
+                    this.renderer.clear();
+                    this.renderer.render();
+                }
                 this.loop();
-            }, 0);
+            }, 1000);
         });
-        // const map = createMap();
-        // const mapEditor = createMapEditor(initialConfig, map);
     }
 
     async downloadMap() {

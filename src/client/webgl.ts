@@ -82,7 +82,7 @@ async function createRenderer() {
 
         // Data
         // prettier-ignore
-        data.push( ...[
+        data=[
 			//	x	y			index
 			0,	0,		0,	
 			1,	0,		1,
@@ -90,7 +90,7 @@ async function createRenderer() {
 			1,	2,		2,
 			1,	3,		2,
 			1,	4,		2,
-		])
+		]
         lenRef[0] = data.length;
 
         // Buffer
@@ -171,24 +171,37 @@ async function createRenderer() {
         // setOldUniforms(updatedUniforms);
     }
 
-    function setOldUniforms(updatedUniforms: UniformsType) {
-        // Deep copy of updatedUniforms
-        const tempUniforms: UniformsType = JSON.parse(JSON.stringify(updatedUniforms));
+    // function setOldUniforms(updatedUniforms: UniformsType) {
+    //     // Deep copy of updatedUniforms
+    //     const tempUniforms: UniformsType = JSON.parse(JSON.stringify(updatedUniforms));
 
-        // Update oldUniforms using the deep copy
-        (Object.keys(tempUniforms) as Array<keyof UniformsType>).forEach(
-            <K extends keyof UniformsType>(key: K) => {
-                oldUniforms[key] = tempUniforms[key];
-            }
-        );
+    //     // Update oldUniforms using the deep copy
+    //     (Object.keys(tempUniforms) as Array<keyof UniformsType>).forEach(
+    //         <K extends keyof UniformsType>(key: K) => {
+    //             oldUniforms[key] = tempUniforms[key];
+    //         }
+    //     );
+    // }
+
+    function buildFramebuffer(tex: WebGLTexture) {
+        const framebuffer = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+
+        return framebuffer;
     }
 
-    function bufferData(data2: Array<number>) {
-        console.log(data2);
-        console.log("bufferData !@#");
-        lenRef[0] = data2.length;
+    function bufferData(data: Array<number>) {
+        const mapData: number[] = [];
+        for (let i = 0; i < data.length; i++) {
+            const x = i % 50;
+            const y = Math.floor(i / 50);
+            mapData.push(x, y, data[i]);
+        }
+        console.log(mapData);
+        lenRef[0] = mapData.length;
         // gl.bindBuffer(gl.ARRAY_BUFFER, arrayBuffer);	// No need to constantly bind
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data2), gl.STATIC_DRAW); // INEFFICIENT AS REPLACES WHOLE THING
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mapData), gl.STATIC_DRAW); // INEFFICIENT AS REPLACES WHOLE THING
     }
 
     function bufferSubData(offset: number, offsetData: number[]) {
@@ -202,6 +215,7 @@ async function createRenderer() {
     }
 
     function render() {
+        console.log("length", lenRef[0]);
         gl.drawArrays(gl.POINTS, 0, lenRef[0] / 3);
     }
 
@@ -225,58 +239,55 @@ async function createRenderer() {
         }
     }
 
-    // function buildTexture(inputWidth: number) {
-    //     try {
-    //         const texture = gl.createTexture();
-    //         gl.bindTexture(gl.TEXTURE_2D, texture);
+    function buildCustomTexture(inputWidth: number) {
+        try {
+            const texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, texture);
 
-    //         if (1) {
-    //             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureAtlas);
-    //         } else {
-    //             const level = 0;
-    //             const internalFormat = gl.RGBA;
-    //             const width = inputWidth;
-    //             const height = 1;
-    //             const border = 0;
-    //             const srcFormat = gl.RGBA;
-    //             const srcType = gl.UNSIGNED_BYTE;
-    //             //prettier-ignore
-    //             const pixel = new Uint8Array(createTexData(width)); // opaque blue
-    //             gl.texImage2D(
-    //                 gl.TEXTURE_2D,
-    //                 level,
-    //                 internalFormat,
-    //                 width,
-    //                 height,
-    //                 border,
-    //                 srcFormat,
-    //                 srcType,
-    //                 pixel
-    //             );
-    //         }
-    //         console.log(gl.getParameter(gl.MAX_TEXTURE_SIZE));
-    //         gl.generateMipmap(gl.TEXTURE_2D);
-    //         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    //         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    //         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    //         // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    //         // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST_MIPMAP_NEAREST);
-    //         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
+            const level = 0;
+            const internalFormat = gl.RGBA;
+            const width = inputWidth;
+            const height = 1;
+            const border = 0;
+            const srcFormat = gl.RGBA;
+            const srcType = gl.UNSIGNED_BYTE;
+            //prettier-ignore
+            const pixel = new Uint8Array(createTexData(width)); // opaque blue
+            gl.texImage2D(
+                gl.TEXTURE_2D,
+                level,
+                internalFormat,
+                width,
+                height,
+                border,
+                srcFormat,
+                srcType,
+                pixel
+            );
+            console.log(gl.getParameter(gl.MAX_TEXTURE_SIZE));
+            gl.generateMipmap(gl.TEXTURE_2D);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST_MIPMAP_NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
 
-    //         return texture;
-    //     } catch (err) {
-    //         throw new Error(`ERROR: ${err}`);
-    //     }
-    // }
-
-    function createTexData(numOfSteps: number = 2) {
-        const tex = [];
-        // tex.push(255, 0, 0, 255);
-        for (let i = 0; i < numOfSteps - 1; i++) {
-            tex.push(255, 0, 0, 255 * (i / numOfSteps - 1));
-            // tex.push(255, 0, 0, 255);
+            return texture;
+        } catch (err) {
+            throw new Error(`ERROR: ${err}`);
         }
-        tex.push(255, 0, 0, 255);
+    }
+
+    function createTexData(numOfSteps: number) {
+        const tex = [];
+        for (let i = 0; i < numOfSteps; i++) {
+            // pixel
+            for (let i = 0; i < 4; i++) {
+                // rgba
+                tex.push(0, 0, 0, 255);
+            }
+        }
 
         return tex;
     }
@@ -333,8 +344,6 @@ async function createRenderer() {
         }
     }
 
-    console.log("Loading textureAtlas");
-    // textureAtlas = await loadImage();
     const imagePromises = Promise.all([tilemap, lightAtlas].map((imgFile) => loadImage(imgFile)));
     return imagePromises.then((returnedImgList) => {
         imgList = returnedImgList;

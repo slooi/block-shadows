@@ -2,7 +2,7 @@ import initalConfig from "./initialConfig";
 import { BlockIndices } from "./importTypes";
 
 export default class Map {
-    foreground: number[][];
+    foreground: number[];
     // background: number[][];
     diameter: number;
     mapDelta: boolean;
@@ -27,37 +27,43 @@ export default class Map {
     }
 
     createDefaultMap(initalForeground?: number[][]) {
-        this.foreground = new Array(this.diameter);
+        const tempForeground = new Array(this.diameter);
         for (let y = 0; y < this.diameter; y++) {
-            this.foreground[y] = new Array(this.diameter);
+            tempForeground[y] = new Array(this.diameter);
             for (let x = 0; x < this.diameter; x++) {
                 if (
                     initalForeground !== undefined &&
                     initalForeground[y] !== undefined &&
                     initalForeground[y][x] !== undefined
                 ) {
-                    this.foreground[y][x] = initalForeground[y][x];
+                    tempForeground[y][x] = initalForeground[y][x];
                 } else {
-                    this.foreground[y][x] = 2;
+                    tempForeground[y][x] = 2;
                 }
             }
         }
+        // console.log(this.foreground);
+        this.foreground = tempForeground.flat();
     }
 
-    getMapData1D(): number[] {
-        //!@#!@# SUPER INEFFICIENT
-        // RETURNS new 1D array.
-        // Structure: x, y, blockId
-        // MUST WORK WITH WEBGL
-        const mapData1D: number[] = [];
-        this.foreground.forEach((arr, y) => {
-            arr.forEach((blockId, x) => {
-                mapData1D.push(x, y, blockId);
-            });
-        });
-        console.log("mapData1D");
-        console.log(mapData1D);
-        return mapData1D;
+    // getMapData1D(): number[] {
+    //     //!@#!@# SUPER INEFFICIENT
+    //     // RETURNS new 1D array.
+    //     // Structure: x, y, blockId
+    //     // MUST WORK WITH WEBGL
+    //     const mapData1D: number[] = [];
+    //     this.foreground.forEach((arr, y) => {
+    //         arr.forEach((blockId, x) => {
+    //             mapData1D.push(x, y, blockId);
+    //         });
+    //     });
+    //     console.log("mapData1D");
+    //     console.log(mapData1D);
+    //     return mapData1D;
+    // }
+
+    getMapData() {
+        return this.foreground;
     }
 
     placeBlock(blockEdit: PosBlock) {
@@ -68,7 +74,7 @@ export default class Map {
             blockEdit.y < this.diameter
         ) {
             // If within map range
-            if (this.foreground[blockEdit.y][blockEdit.x] !== blockEdit.blockIndex) {
+            if (this.getBlockIndex(blockEdit.y, blockEdit.x) !== blockEdit.blockIndex) {
                 console.log("PLACED BLOCK");
                 // Only if there's a difference
 
@@ -80,11 +86,20 @@ export default class Map {
                 this.offsetData = [blockEdit.x, blockEdit.y, blockEdit.blockIndex];
 
                 // Real change
-                this.foreground[blockEdit.y][blockEdit.x] = blockEdit.blockIndex;
+                this.setBlockIndex(blockEdit.blockIndex, blockEdit.y, blockEdit.x);
             }
         }
         // places block
     }
+
+    setBlockIndex(val: number, y: number, x: number) {
+        this.foreground[y * 50 + x] = val;
+    }
+
+    getBlockIndex(y: number, x: number) {
+        return y * 50 + x;
+    }
+
     getMapDelta() {
         return this.mapDelta;
     }
