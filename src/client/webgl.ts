@@ -1,7 +1,10 @@
 console.log("webgl.ts");
 
-import tilemap from "../assets/tilemap.png";
 import initalConfig from "./initialConfig";
+
+// Images
+import tilemap from "../assets/tilemap.png";
+import lightAtlas from "../assets/lightAtlas.png";
 
 // SHADERS
 import vsSource from "./shaders/vertex.glsl";
@@ -20,7 +23,7 @@ async function createRenderer() {
             `ERROR: gl.getExtension('OES_element_index_uint') not supported! Lol wut, everything should support it`
         );
     }
-    let textureAtlas: HTMLImageElement;
+    let imgList: HTMLImageElement[] = [];
 
     // Exposing and setup of webgl components and variables
     const arrayBuffer = gl.createBuffer();
@@ -122,7 +125,7 @@ async function createRenderer() {
 
         // Textures
         gl.activeTexture(gl.TEXTURE0 + 0);
-        const texture = buildTexture(32);
+        const tileTexture = buildTexture(imgList[0]);
         // gl.bindTexture(gl.TEXTURE_2D, texture);
 
         // uniform
@@ -202,36 +205,12 @@ async function createRenderer() {
         gl.drawArrays(gl.POINTS, 0, lenRef[0] / 3);
     }
 
-    async function buildTexture(inputWidth: number) {
+    function buildTexture(textureImage: TexImageSource) {
         try {
             const texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureImage);
 
-            if (1) {
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureAtlas);
-            } else {
-                const level = 0;
-                const internalFormat = gl.RGBA;
-                const width = inputWidth;
-                const height = 1;
-                const border = 0;
-                const srcFormat = gl.RGBA;
-                const srcType = gl.UNSIGNED_BYTE;
-                //prettier-ignore
-                const pixel = new Uint8Array(createTexData(width)); // opaque blue
-                gl.texImage2D(
-                    gl.TEXTURE_2D,
-                    level,
-                    internalFormat,
-                    width,
-                    height,
-                    border,
-                    srcFormat,
-                    srcType,
-                    pixel
-                );
-            }
-            console.log(gl.getParameter(gl.MAX_TEXTURE_SIZE));
             gl.generateMipmap(gl.TEXTURE_2D);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
@@ -246,6 +225,50 @@ async function createRenderer() {
         }
     }
 
+    // function buildTexture(inputWidth: number) {
+    //     try {
+    //         const texture = gl.createTexture();
+    //         gl.bindTexture(gl.TEXTURE_2D, texture);
+
+    //         if (1) {
+    //             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureAtlas);
+    //         } else {
+    //             const level = 0;
+    //             const internalFormat = gl.RGBA;
+    //             const width = inputWidth;
+    //             const height = 1;
+    //             const border = 0;
+    //             const srcFormat = gl.RGBA;
+    //             const srcType = gl.UNSIGNED_BYTE;
+    //             //prettier-ignore
+    //             const pixel = new Uint8Array(createTexData(width)); // opaque blue
+    //             gl.texImage2D(
+    //                 gl.TEXTURE_2D,
+    //                 level,
+    //                 internalFormat,
+    //                 width,
+    //                 height,
+    //                 border,
+    //                 srcFormat,
+    //                 srcType,
+    //                 pixel
+    //             );
+    //         }
+    //         console.log(gl.getParameter(gl.MAX_TEXTURE_SIZE));
+    //         gl.generateMipmap(gl.TEXTURE_2D);
+    //         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    //         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    //         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    //         // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    //         // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST_MIPMAP_NEAREST);
+    //         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
+
+    //         return texture;
+    //     } catch (err) {
+    //         throw new Error(`ERROR: ${err}`);
+    //     }
+    // }
+
     function createTexData(numOfSteps: number = 2) {
         const tex = [];
         // tex.push(255, 0, 0, 255);
@@ -258,10 +281,10 @@ async function createRenderer() {
         return tex;
     }
 
-    function loadImage() {
+    function loadImage(imageFile: string) {
         return new Promise<HTMLImageElement>((resolve, reject) => {
             const img = new Image();
-            img.src = tilemap;
+            img.src = imageFile;
             img.addEventListener("error", (e) => {
                 console.log(e);
             });
@@ -312,8 +335,9 @@ async function createRenderer() {
 
     console.log("Loading textureAtlas");
     // textureAtlas = await loadImage();
-    return loadImage().then((img) => {
-        textureAtlas = img;
+    const imagePromises = Promise.all([tilemap, lightAtlas].map((imgFile) => loadImage(imgFile)));
+    return imagePromises.then((returnedImgList) => {
+        imgList = returnedImgList;
         webglSetup();
         console.log("Running webgl setup");
         return {

@@ -15,7 +15,7 @@ export default class Map {
         //     [1, 2],
         //     [5, 4],
         // ];
-        this.diameter = 1000; //!@#!@#!@# change later
+        this.diameter = 50; //!@#!@#!@# change later
         this.mapDelta = false;
         this.offset = -1;
         this.offsetData = [];

@@ -9,10 +9,6 @@ declare module "*.glsl" {
 
 declare module "*.png";
 declare module "*.css";
-declare module "*.html" {
-    const value: string;
-    export default value;
-}
 type KeyDownType =
     | "`"
     | "1"
