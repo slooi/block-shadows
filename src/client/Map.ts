@@ -15,7 +15,7 @@ export default class Map {
         //     [1, 2],
         //     [5, 4],
         // ];
-        this.diameter = 50; //!@#!@#!@# change later
+        this.diameter = initalConfig.mapDia; //!@#!@#!@# change later
         this.mapDelta = false;
         this.offset = -1;
         this.offsetData = [];
@@ -93,11 +93,11 @@ export default class Map {
     }
 
     setBlockIndex(val: number, y: number, x: number) {
-        this.foreground[y * 50 + x] = val;
+        this.foreground[y * initalConfig.mapDia + x] = val;
     }
 
     getBlockIndex(y: number, x: number) {
-        return y * 50 + x;
+        return y * initalConfig.mapDia + x;
     }
 
     getMapDelta() {

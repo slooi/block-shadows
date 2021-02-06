@@ -194,11 +194,10 @@ async function createRenderer() {
     function bufferData(data: Array<number>) {
         const mapData: number[] = [];
         for (let i = 0; i < data.length; i++) {
-            const x = i % 50;
-            const y = Math.floor(i / 50);
+            const x = i % initalConfig.mapDia;
+            const y = Math.floor(i / initalConfig.mapDia);
             mapData.push(x, y, data[i]);
         }
-        console.log(mapData);
         lenRef[0] = mapData.length;
         // gl.bindBuffer(gl.ARRAY_BUFFER, arrayBuffer);	// No need to constantly bind
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mapData), gl.STATIC_DRAW); // INEFFICIENT AS REPLACES WHOLE THING

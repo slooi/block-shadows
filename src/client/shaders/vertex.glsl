@@ -14,6 +14,6 @@ uniform vec2 u_GameWindow;
 void main(){
 	v_BlockIndex = a_BlockIndex;
 
-	gl_PointSize = u_BlockDia+0.05;
+	gl_PointSize = u_BlockDia+0.1;
 	gl_Position = vec4((vec2(a_BlockPos.x*u_BlockDia,-a_BlockPos.y*u_BlockDia)-u_CamPos)/(u_GameWindow*0.5),0,1);
 }
