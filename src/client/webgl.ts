@@ -40,6 +40,9 @@ async function createRenderer() {
 
     let lenRef: number = 0;
 
+    const tileTexture = buildTexture()!;
+    let lightmapTexture = buildTexture()!;
+
     // Setup
 
     function webglSetup() {
@@ -124,7 +127,8 @@ async function createRenderer() {
 
         // Textures
         gl.activeTexture(gl.TEXTURE0 + 0);
-        const tileTexture = buildTexture(imgList[0]);
+        buildTextureTiles(tileTexture, imgList[0]);
+
         // gl.bindTexture(gl.TEXTURE_2D, texture);
 
         // uniform
@@ -155,8 +159,8 @@ async function createRenderer() {
             gl.uniform1f(uniformLocations.u_BlockDia, updatedUniforms.u_BlockDia);
         if (updatedUniforms.u_CamPos !== undefined)
             gl.uniform2fv(uniformLocations.u_CamPos, [
-                Math.round(updatedUniforms.u_CamPos[0] * 1000) / 1000,
-                Math.round(-updatedUniforms.u_CamPos[1] * 1000) / 1000,
+                updatedUniforms.u_CamPos[0],
+                -updatedUniforms.u_CamPos[1],
             ]);
 
         if (updatedUniforms.u_GameWindow !== undefined) {
@@ -199,6 +203,8 @@ async function createRenderer() {
         }
         lenRef = mapData.length;
         // buildCustomTexture(data); //!@#!@#!@#!@#!#!#!#!@#!@# change later
+        buildTextureLightmap(lightmapTexture, data);
+        gl.bindTexture(gl.TEXTURE_2D, tileTexture);
 
         // gl.bindBuffer(gl.ARRAY_BUFFER, arrayBuffer);	// No need to constantly bind
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mapData), gl.STATIC_DRAW); // INEFFICIENT AS REPLACES WHOLE THING
@@ -218,9 +224,13 @@ async function createRenderer() {
         gl.drawArrays(gl.POINTS, 0, lenRef / 3);
     }
 
-    function buildTexture(textureImage: TexImageSource) {
+    function buildTexture() {
+        const texture = gl.createTexture();
+        return texture;
+    }
+
+    function buildTextureTiles(texture: WebGLTexture, textureImage: TexImageSource) {
         try {
-            const texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, texture);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureImage);
 
@@ -231,13 +241,10 @@ async function createRenderer() {
             // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
             // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST_MIPMAP_NEAREST);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
-
-            return texture;
         } catch (err) {
             throw new Error(`ERROR: ${err}`);
         }
     }
-
     function blockIdsToLightInfo(blockIdList: number[]) {
         const lightInfoList = [];
         for (let i = 0; i < blockIdList.length; i++) {
@@ -256,9 +263,8 @@ async function createRenderer() {
         return lightInfoList;
     }
 
-    function buildCustomTexture(blockIdList: number[]) {
+    function buildTextureLightmap(texture: WebGLTexture, blockIdList: number[]) {
         try {
-            const texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, texture);
 
             const level = 0;
@@ -289,8 +295,6 @@ async function createRenderer() {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
             // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST_MIPMAP_NEAREST);
             // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-
-            return texture;
         } catch (err) {
             throw new Error(`ERROR: ${err}`);
         }
