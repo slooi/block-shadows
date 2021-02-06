@@ -57,7 +57,7 @@ export default class Game {
                     this.renderer.render();
                 }
                 this.loop();
-            }, 0);
+            }, 400);
         });
     }
 

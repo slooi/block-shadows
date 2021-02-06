@@ -38,7 +38,7 @@ async function createRenderer() {
         u_GameWindow: [initialConfig.gameWindow.width, initialConfig.gameWindow.height],
     };
 
-    const lenRef: number[] = [];
+    let lenRef: number = 0;
 
     // Setup
 
@@ -90,7 +90,7 @@ async function createRenderer() {
 			1,	3,		2,
 			1,	4,		2,
 		]
-        lenRef[0] = data.length;
+        lenRef = data.length;
 
         // Buffer
         // const arrayBuffer = gl.createBuffer();
@@ -197,7 +197,7 @@ async function createRenderer() {
             const y = Math.floor(i / initialConfig.mapDia);
             mapData.push(x, y, data[i]);
         }
-        lenRef[0] = mapData.length;
+        lenRef = mapData.length;
         // buildCustomTexture(data); //!@#!@#!@#!@#!#!#!#!@#!@# change later
 
         // gl.bindBuffer(gl.ARRAY_BUFFER, arrayBuffer);	// No need to constantly bind
@@ -215,7 +215,7 @@ async function createRenderer() {
     }
 
     function render() {
-        gl.drawArrays(gl.POINTS, 0, lenRef[0] / 3);
+        gl.drawArrays(gl.POINTS, 0, lenRef / 3);
     }
 
     function buildTexture(textureImage: TexImageSource) {
@@ -238,7 +238,23 @@ async function createRenderer() {
         }
     }
 
-    function blockIdsToLightInfo(blockIdList: number[]) {}
+    function blockIdsToLightInfo(blockIdList: number[]) {
+        const lightInfoList = [];
+        for (let i = 0; i < blockIdList.length; i++) {
+            // For each tile
+            for (let i = 0; i < 4; i++) {
+                // Source block
+                lightInfoList.push(0);
+                // Ant block
+                lightInfoList.push(0);
+                // Transparent
+                lightInfoList.push(0);
+                // 0
+                lightInfoList.push(0);
+            }
+        }
+        return lightInfoList;
+    }
 
     function buildCustomTexture(blockIdList: number[]) {
         try {
@@ -248,31 +264,31 @@ async function createRenderer() {
             const level = 0;
             const internalFormat = gl.RGBA;
             const width = initialConfig.mapDia;
-            const height = 1;
+            const height = initialConfig.mapDia;
             const border = 0;
             const srcFormat = gl.RGBA;
             const srcType = gl.UNSIGNED_BYTE;
             //prettier-ignore
-            const pixel = new Uint8Array([]); // opaque blue
-            gl.texImage2D(
-                gl.TEXTURE_2D,
-                level,
-                internalFormat,
-                width,
-                height,
-                border,
-                srcFormat,
-                srcType,
-                pixel
-            );
+            // const pixel = new Uint8Array(blockIdsToLightInfo(blockIdList)); // opaque blue
+            // gl.texImage2D(
+            //     gl.TEXTURE_2D,
+            //     level,
+            //     internalFormat,
+            //     width,
+            //     height,
+            //     border,
+            //     srcFormat,
+            //     srcType,
+            //     pixel
+            // );
             console.log(gl.getParameter(gl.MAX_TEXTURE_SIZE));
-            gl.generateMipmap(gl.TEXTURE_2D);
+            // gl.generateMipmap(gl.TEXTURE_2D);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
             // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST_MIPMAP_NEAREST);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
 
             return texture;
         } catch (err) {
