@@ -2,7 +2,7 @@
 
 declare const _default: {
 	readonly numOfBlocks: 8;
-	readonly blockDia: 2;
+	readonly blockDia: 64;
 	readonly gameWindow: {
 		readonly width: 800;
 		readonly height: 800;
