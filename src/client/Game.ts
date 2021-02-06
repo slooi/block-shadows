@@ -6,7 +6,7 @@
 + Calls renderer render
 */
 
-import { Camera } from "./Camera";
+import Camera from "./Camera";
 import initialConfig from "./initialConfig";
 import createRenderer from "./webgl";
 import createMapEditor from "./mapEditor";
@@ -23,15 +23,21 @@ export default class Game {
 
     constructor(inputHandler: InputHandlerType) {
         // Setup up
+        // Map
         this.map = new Map();
-
-        // Player
-        console.log("inputHandler", inputHandler);
-        this.player = new Player(inputHandler, 0, 0);
 
         // camera
         this.canvas = document.getElementById("canvas")! as HTMLCanvasElement;
+        this.canvas.width = initialConfig.gameWindow.width;
+        this.canvas.height = initialConfig.gameWindow.height;
+        this.canvas.style.width = `${initialConfig.gameWindow.width}px`;
+        this.canvas.style.height = `${initialConfig.gameWindow.height}px`;
         this.camera = new Camera(0, 0, this.canvas.width, this.canvas.height);
+
+        // Player
+        console.log("inputHandler", inputHandler);
+        this.player = new Player(0, 0, inputHandler, this.map, this.camera);
+
         this.camera.setTarget(this.player);
 
         // Renderer
@@ -59,14 +65,22 @@ export default class Game {
             // Game loop
 
             // Player
-            this.player.updatePos();
+            this.player.update();
 
             // Camera
             this.camera.update();
 
+            // Rendering
+            // Check if need to update webgl
+            if (this.map.mapDelta) {
+                this.renderer.bufferSubData(this.map.getOffset(), this.map.getOffsetData());
+                // this.renderer.bufferData(this.map.getMapData1D());
+                this.map.resetMapDelta();
+            } // !@#!@#!@# change later. inefficient
+
             // Renderer
             this.renderer.clear();
-            this.renderer.updateUniform({ u_CamPos: this.player.getPos() }); //!@#!@#!@# change later
+            this.renderer.updateUniform({ u_CamPos: this.camera.getPos() }); //!@#!@#!@# change later
             this.renderer.render();
             // console.log("Render");
 

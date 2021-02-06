@@ -68,5 +68,5 @@
     },
     "compileOnSave": true,
     "exclude": ["node_modules"],
-    "include": ["src/**/*"] // "webpack.common.js"]
+    "include": ["src/**/*"] // "webpack.common.js"]//, "src/client/initialConfig.d.ts"
 }

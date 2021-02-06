@@ -12,8 +12,24 @@ precision mediump float;
 varying float v_BlockIndex;
 uniform sampler2D u_Textures;
 uniform float u_NumOfBlocks;
+uniform highp float u_BlockDia;
+uniform float u_Off;
 
 void main(){
-	// gl_FragColor = texture2D(u_Textures,vec2(gl_PointCoord.x,gl_PointCoord.y));//vec4(1,1,0,1);
-	gl_FragColor = texture2D(u_Textures,vec2(0.01+gl_PointCoord.x*0.90/u_NumOfBlocks+v_BlockIndex/u_NumOfBlocks,gl_PointCoord.y));//vec4(1,1,0,1);
+	float pixelLen = 1.0/16.0;
+	float halfPixel = pixelLen/2.0;
+	float quarPixel = halfPixel/2.0;
+	float quarPixel2 = quarPixel/2.0;
+	float finPixel = quarPixel+halfPixel+quarPixel+quarPixel2;
+	float offset = u_Off / u_NumOfBlocks;
+	float low = halfPixel;
+	float posX = clamp(gl_PointCoord.x,low,(1.0-low));
+	gl_FragColor = texture2D(
+		u_Textures,
+		vec2(
+			posX/u_NumOfBlocks
+			+v_BlockIndex/u_NumOfBlocks,
+			gl_PointCoord.y
+		)
+	);
 }

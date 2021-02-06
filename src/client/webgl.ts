@@ -11,7 +11,7 @@ import fsSource from "./shaders/fragment.glsl";
 const canvas = document.getElementById("canvas")! as HTMLCanvasElement;
 
 async function createRenderer() {
-    let gl = canvas.getContext("webgl", { premultipliedAlpha: false, antialias: false })
+    let gl = canvas.getContext("webgl", { premultipliedAlpha: false, antialias: true })
         ? <WebGLRenderingContext>canvas.getContext("webgl")
         : (canvas.getContext("experimental-webgl") as WebGLRenderingContext);
     var ext = gl.getExtension("OES_element_index_uint");
@@ -31,16 +31,18 @@ async function createRenderer() {
 
     // setup variables
     const oldUniforms: UniformsType = {
-        u_BlockDia: 16,
+        u_BlockDia: initalConfig.blockDia,
         u_CamPos: [0, 0],
-        u_GameWindow: [400, 400],
+        u_GameWindow: [initalConfig.gameWindow.width, initalConfig.gameWindow.height],
     };
+
+    const lenRef: number[] = [];
 
     // Setup
 
     function webglSetup() {
         // Setup
-        gl.viewport(0, 0, 400, 400);
+        gl.viewport(0, 0, initalConfig.gameWindow.width, initalConfig.gameWindow.height);
         gl.clearColor(0, 0, 1, 1);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         gl.enable(gl.BLEND);
@@ -86,10 +88,11 @@ async function createRenderer() {
 			1,	3,		2,
 			1,	4,		2,
 		])
+        lenRef[0] = data.length;
 
         // Buffer
         // const arrayBuffer = gl.createBuffer();
-        // gl.bindBuffer(gl.ARRAY_BUFFER, arrayBuffer);
+        gl.bindBuffer(gl.ARRAY_BUFFER, arrayBuffer);
         // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
         bufferData(data);
         console.log("koi");
@@ -126,6 +129,7 @@ async function createRenderer() {
         //CONSTANT
         gl.uniform1i(uniformLocations.u_Textures, 0);
         gl.uniform1f(uniformLocations.u_NumOfBlocks, initalConfig.numOfBlocks);
+        gl.uniform1f(uniformLocations.u_Off, 1 / 32 + 1 / 32 / 2 + 1 / 32 / 4 + 1 / 32 / 8);
         //
         // gl.uniform1f(uniformLocations.u_BlockDia, 16);
         // gl.uniform2fv(uniformLocations.u_CamPos, [0, 0]);
@@ -149,12 +153,15 @@ async function createRenderer() {
             gl.uniform1f(uniformLocations.u_BlockDia, updatedUniforms.u_BlockDia);
         if (updatedUniforms.u_CamPos !== undefined)
             gl.uniform2fv(uniformLocations.u_CamPos, [
-                updatedUniforms.u_CamPos[0],
-                -updatedUniforms.u_CamPos[1],
+                Math.round(updatedUniforms.u_CamPos[0] * 1000) / 1000,
+                Math.round(-updatedUniforms.u_CamPos[1] * 1000) / 1000,
             ]);
 
         if (updatedUniforms.u_GameWindow !== undefined) {
-            gl.uniform2fv(uniformLocations.u_GameWindow, [400, 400]);
+            gl.uniform2fv(uniformLocations.u_GameWindow, [
+                updatedUniforms.u_GameWindow[0],
+                updatedUniforms.u_GameWindow[1],
+            ]);
         }
 
         // Update old uniforms
@@ -176,9 +183,15 @@ async function createRenderer() {
     function bufferData(data2: Array<number>) {
         console.log(data2);
         console.log("bufferData !@#");
-        data = data2;
-        gl.bindBuffer(gl.ARRAY_BUFFER, arrayBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data2), gl.STATIC_DRAW);
+        lenRef[0] = data2.length;
+        // gl.bindBuffer(gl.ARRAY_BUFFER, arrayBuffer);	// No need to constantly bind
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data2), gl.STATIC_DRAW); // INEFFICIENT AS REPLACES WHOLE THING
+    }
+
+    function bufferSubData(offset: number, offsetData: number[]) {
+        // THIS MODIFIES
+
+        gl.bufferSubData(gl.ARRAY_BUFFER, offset, new Float32Array(offsetData));
     }
 
     function clear() {
@@ -186,7 +199,7 @@ async function createRenderer() {
     }
 
     function render() {
-        gl.drawArrays(gl.POINTS, 0, data.length / 3);
+        gl.drawArrays(gl.POINTS, 0, lenRef[0] / 3);
     }
 
     async function buildTexture(inputWidth: number) {
@@ -218,11 +231,13 @@ async function createRenderer() {
                     pixel
                 );
             }
-
+            gl.generateMipmap(gl.TEXTURE_2D);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST_MIPMAP_NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_NEAREST);
 
             return texture;
         } catch (err) {
@@ -305,6 +320,7 @@ async function createRenderer() {
             clear,
             render,
             updateUniform,
+            bufferSubData,
         };
     });
 }

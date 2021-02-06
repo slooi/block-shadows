@@ -5,6 +5,7 @@ declare function createRenderer(): Promise<{
     updateUniform: (updatedUniforms: {
         u_BlockDia?: number | undefined;
         u_CamPos?: [number, number] | undefined;
+        u_GameWindow?: [number, number] | undefined;
     }) => void;
 }>;
 export default createRenderer;

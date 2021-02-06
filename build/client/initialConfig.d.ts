@@ -1,8 +1,9 @@
-declare const initalConfig: {
-    blockDia: number;
-    mapDimensions: {
-        width: number;
-        height: number;
+declare const _default: {
+    readonly numOfBlocks: 5;
+    readonly blockDia: 16;
+    readonly mapDimensions: {
+        readonly width: 400;
+        readonly height: 400;
     };
 };
-export default initalConfig;
+export default _default;

@@ -15,5 +15,6 @@ export declare class Camera {
     setTarget(target: TargetType): void;
     update(): void;
     getDetails(): [number, number, number, number];
+    getPos(): [number, number];
 }
 export {};

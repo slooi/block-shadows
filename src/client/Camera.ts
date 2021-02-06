@@ -4,7 +4,7 @@
 */
 type TargetType = { [x: string]: any } & { x: number; y: number };
 
-export class Camera {
+export default class Camera {
     x: number;
     y: number;
     w: number;
@@ -18,7 +18,7 @@ export class Camera {
         this.w = w;
         this.h = h;
         this.target = 0;
-        this.lag = 0.01;
+        this.lag = 0.1;
     }
 
     setTarget(target: TargetType) {
@@ -27,9 +27,8 @@ export class Camera {
 
     update() {
         if (this.target !== 0) {
-            console.log(this.x);
-            this.x = (this.target.x - this.x) * this.lag;
-            this.y = (this.target.y - this.y) * this.lag;
+            this.x += (this.target.x - this.x) * this.lag;
+            this.y += (this.target.y - this.y) * this.lag;
         }
     }
 

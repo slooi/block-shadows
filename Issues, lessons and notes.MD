@@ -61,6 +61,9 @@ const animal: Optional<Animal> = {
     [K in keyof T]:T[K]
     }
 
+-       Use clamp(gl_PoinPosition.x,offset,1.0-offset) instead of doing math without clamp in the texture2D(). Clamp PREVENTS texture bleed with math and
+    seems!
+
 #### Webgl notes
 
 -   Make sure to use the right data type to store values

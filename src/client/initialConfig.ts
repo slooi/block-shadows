@@ -1,8 +1,8 @@
 export default {
-    numOfBlocks: 5,
-    blockDia: 16,
-    mapDimensions: {
-        width: 400,
-        height: 400,
+    numOfBlocks: 8,
+    blockDia: 2,
+    gameWindow: {
+        width: 800,
+        height: 800,
     },
 } as const;
