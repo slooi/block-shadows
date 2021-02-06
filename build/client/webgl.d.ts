@@ -7,5 +7,6 @@ declare function createRenderer(): Promise<{
         u_CamPos?: [number, number] | undefined;
         u_GameWindow?: [number, number] | undefined;
     }) => void;
+    bufferSubData: (offset: number, offsetData: number[]) => void;
 }>;
 export default createRenderer;

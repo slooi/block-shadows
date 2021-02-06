@@ -231,6 +231,7 @@ async function createRenderer() {
                     pixel
                 );
             }
+            console.log(gl.getParameter(gl.MAX_TEXTURE_SIZE));
             gl.generateMipmap(gl.TEXTURE_2D);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);

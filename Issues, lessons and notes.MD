@@ -61,8 +61,9 @@ const animal: Optional<Animal> = {
     [K in keyof T]:T[K]
     }
 
--       Use clamp(gl_PoinPosition.x,offset,1.0-offset) instead of doing math without clamp in the texture2D(). Clamp PREVENTS texture bleed with math and
+-   Use clamp(gl_PoinPosition.x,offset,1.0-offset) instead of doing math without clamp in the texture2D(). Clamp PREVENTS texture bleed with math and
     seems!
+-   Use gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST); for when blocks are zoomed inNOT the mipmap!
 
 #### Webgl notes
 

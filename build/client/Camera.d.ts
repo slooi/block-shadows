@@ -4,7 +4,7 @@ declare type TargetType = {
     x: number;
     y: number;
 };
-export declare class Camera {
+export default class Camera {
     x: number;
     y: number;
     w: number;

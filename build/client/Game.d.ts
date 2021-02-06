@@ -1,4 +1,4 @@
-import { Camera } from "./Camera";
+import Camera from "./Camera";
 import createRenderer from "./webgl";
 import Player from "./Player";
 import { InputHandlerType } from "./importTypes";

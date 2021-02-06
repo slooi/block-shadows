@@ -1,8 +1,8 @@
 export default {
     numOfBlocks: 8,
-    blockDia: 64,
+    blockDia: 32,
     gameWindow: {
-        width: 800,
-        height: 800,
+        width: 1600,
+        height: 1600,
     },
 } as const;
