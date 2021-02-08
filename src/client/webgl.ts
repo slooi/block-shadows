@@ -225,7 +225,22 @@ async function createRenderer() {
         const x = offsetData[0];
         const y = offsetData[1];
         const id = offsetData[2];
-        lightTextureData[y * initialConfig.mapDia + x] = id;
+        // lightTextureData.reverse();
+        console.log("WAWAWAW");
+        console.log(y, x);
+        console.log(id);
+        if (id === 5) {
+            lightTextureData[y * initialConfig.mapDia * 4 + x * 4 + 0] = 0;
+            lightTextureData[y * initialConfig.mapDia * 4 + x * 4 + 1] = 255;
+            lightTextureData[y * initialConfig.mapDia * 4 + x * 4 + 2] = 0;
+            lightTextureData[y * initialConfig.mapDia * 4 + x * 4 + 3] = 255;
+        } else {
+            console.log("RED");
+            lightTextureData[y * initialConfig.mapDia * 4 + x * 4 + 0] = 0;
+            lightTextureData[y * initialConfig.mapDia * 4 + x * 4 + 1] = 0;
+            lightTextureData[y * initialConfig.mapDia * 4 + x * 4 + 2] = 0;
+            lightTextureData[y * initialConfig.mapDia * 4 + x * 4 + 3] = 255;
+        }
     }
 
     function clear() {
@@ -343,8 +358,10 @@ async function createRenderer() {
             // gl.generateMipmap(gl.TEXTURE_2D);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
             // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST_MIPMAP_NEAREST);
             // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
         } catch (err) {

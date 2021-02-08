@@ -74,6 +74,9 @@ export default class Map {
             blockEdit.x < this.diameter &&
             blockEdit.y < this.diameter
         ) {
+            console.log("blockEdit");
+            console.log(blockEdit);
+            console.log(blockEdit.blockIndex);
             // If within map range
             if (this.getBlockIndex(blockEdit.y, blockEdit.x) !== blockEdit.blockIndex) {
                 console.log("PLACED BLOCK");

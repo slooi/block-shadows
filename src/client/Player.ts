@@ -44,7 +44,6 @@ export default class Player {
         // mouse
         // console.log("this.inputHandler.getMouseDown()", this.inputHandler.getMouseDown());
         if (this.inputHandler.getMouseDown()) {
-            console.log("asd");
             const indexPos = this.screenSpaceToMapIndex(this.inputHandler.getMousePos());
             this.map.placeBlock({ x: indexPos[0], y: indexPos[1], blockIndex: 0 });
         }
