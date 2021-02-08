@@ -51,7 +51,7 @@ export default class Game {
             console.log("buffer Data END");
 
             setTimeout(() => {
-                let test = 0;
+                let test = 1;
                 if (test === 1) {
                     this.renderer.clear();
                     this.renderer.render();

@@ -45,7 +45,6 @@ export default function createInputHandler() {
         state.keysDown[key] = isDown;
 
         const numKey = Number(key);
-        isTenDigit(numKey);
         if (isTenDigit(numKey)) {
             state.lastDigitPressed = numKey;
         }

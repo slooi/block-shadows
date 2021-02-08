@@ -38,10 +38,12 @@ async function createRenderer() {
         u_GameWindow: [initialConfig.gameWindow.width, initialConfig.gameWindow.height],
     };
 
-    let lenRef: number = 0;
+    let dataLength: number = 0;
 
     const tileTexture = buildTexture()!;
     let lightmapTexture = buildTexture()!;
+
+    let lightTextureData: Uint8Array;
 
     // Setup
 
@@ -93,7 +95,7 @@ async function createRenderer() {
 			1,	3,		2,
 			1,	4,		2,
 		]
-        lenRef = data.length;
+        dataLength = data.length;
 
         // Buffer
         // const arrayBuffer = gl.createBuffer();
@@ -135,7 +137,8 @@ async function createRenderer() {
         //CONSTANT
         gl.uniform1i(uniformLocations.u_Textures, 0);
         gl.uniform1f(uniformLocations.u_NumOfBlocks, initialConfig.numOfBlocks);
-        gl.uniform1f(uniformLocations.u_Off, 1 / 32 + 1 / 32 / 2 + 1 / 32 / 4 + 1 / 32 / 8);
+        gl.uniform1i(uniformLocations.u_Mode, 1); // 0 - default, 1 - light texture show
+
         //
         // gl.uniform1f(uniformLocations.u_BlockDia, 16);
         // gl.uniform2fv(uniformLocations.u_CamPos, [0, 0]);
@@ -194,26 +197,35 @@ async function createRenderer() {
         return framebuffer;
     }
 
-    function bufferData(data: Array<number>) {
-        const mapData: number[] = [];
-        for (let i = 0; i < data.length; i++) {
+    function bufferData(map: Array<number>) {
+        const mapForWebgl: number[] = [];
+        for (let i = 0; i < map.length; i++) {
             const x = i % initialConfig.mapDia;
             const y = Math.floor(i / initialConfig.mapDia);
-            mapData.push(x, y, data[i]);
+            mapForWebgl.push(x, y, map[i]);
         }
-        lenRef = mapData.length;
+        dataLength = mapForWebgl.length;
         // buildCustomTexture(data); //!@#!@#!@#!@#!#!#!#!@#!@# change later
-        buildTextureLightmap(lightmapTexture, data);
-        gl.bindTexture(gl.TEXTURE_2D, tileTexture);
+        buildTextureLightmap(lightmapTexture, map);
+
+        // gl.bindTexture(gl.TEXTURE_2D, tileTexture);
 
         // gl.bindBuffer(gl.ARRAY_BUFFER, arrayBuffer);	// No need to constantly bind
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mapData), gl.STATIC_DRAW); // INEFFICIENT AS REPLACES WHOLE THING
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mapForWebgl), gl.STATIC_DRAW); // INEFFICIENT AS REPLACES WHOLE THING
     }
 
     function bufferSubData(offset: number, offsetData: number[]) {
         // THIS MODIFIES
-
+        offsetDataToLightTextureData(offsetData);
+        setTextureData(lightmapTexture);
         gl.bufferSubData(gl.ARRAY_BUFFER, offset, new Float32Array(offsetData));
+    }
+
+    function offsetDataToLightTextureData(offsetData: number[]) {
+        const x = offsetData[0];
+        const y = offsetData[1];
+        const id = offsetData[2];
+        lightTextureData[y * initialConfig.mapDia + x] = id;
     }
 
     function clear() {
@@ -221,7 +233,7 @@ async function createRenderer() {
     }
 
     function render() {
-        gl.drawArrays(gl.POINTS, 0, lenRef / 3);
+        gl.drawArrays(gl.POINTS, 0, dataLength / 3);
     }
 
     function buildTexture() {
@@ -262,31 +274,71 @@ async function createRenderer() {
         }
         return lightInfoList;
     }
+    function mapToLightTextureData(map: number[]) {
+        console.log(map[10]);
+        const textureData: number[] = [];
+        for (let y = 0; y < initialConfig.mapDia; y++) {
+            for (let x = 0; x < initialConfig.mapDia; x++) {
+                if (map[y * initialConfig.mapDia + x] === 5) {
+                    textureData.push(255, 0, 0, 255);
+                } else {
+                    textureData.push(0, 0, 0, 255);
+                }
+            }
+        }
 
-    function buildTextureLightmap(texture: WebGLTexture, blockIdList: number[]) {
+        return new Uint8Array(textureData);
+    }
+
+    function setTextureData(texture: WebGLTexture) {
+        // gl.bindTexture()
+        const level = 0;
+        const internalFormat = gl.RGBA;
+        const width = initialConfig.mapDia; //!@#!@# change in the future
+        const height = initialConfig.mapDia; //!@#!@# change in the future
+        const border = 0;
+        const srcFormat = gl.RGBA;
+        const srcType = gl.UNSIGNED_BYTE;
+        gl.texImage2D(
+            gl.TEXTURE_2D,
+            level,
+            internalFormat,
+            width,
+            height,
+            border,
+            srcFormat,
+            srcType,
+            lightTextureData
+        );
+    }
+
+    function buildTextureLightmap(texture: WebGLTexture, map: number[]) {
         try {
             gl.bindTexture(gl.TEXTURE_2D, texture);
 
             const level = 0;
             const internalFormat = gl.RGBA;
-            const width = initialConfig.mapDia;
-            const height = initialConfig.mapDia;
+            const width = initialConfig.mapDia; //!@#!@# change in the future
+            const height = initialConfig.mapDia; //!@#!@# change in the future
             const border = 0;
             const srcFormat = gl.RGBA;
             const srcType = gl.UNSIGNED_BYTE;
             //prettier-ignore
             // const pixel = new Uint8Array(blockIdsToLightInfo(blockIdList)); // opaque blue
-            // gl.texImage2D(
-            //     gl.TEXTURE_2D,
-            //     level,
-            //     internalFormat,
-            //     width,
-            //     height,
-            //     border,
-            //     srcFormat,
-            //     srcType,
-            //     pixel
-            // );
+            lightTextureData = mapToLightTextureData(map)
+            gl.texImage2D(
+                gl.TEXTURE_2D,
+                level,
+                internalFormat,
+                width,
+                height,
+                border,
+                srcFormat,
+                srcType,
+                lightTextureData
+            );
+            console.log("map");
+            console.log(map);
             console.log(gl.getParameter(gl.MAX_TEXTURE_SIZE));
             // gl.generateMipmap(gl.TEXTURE_2D);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
