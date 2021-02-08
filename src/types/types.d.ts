@@ -7,6 +7,11 @@ declare module "*.glsl" {
 //     export default value;
 // }
 
+type GeneralNumbersUpTo<T extends number, A extends number[] = []> =
+    | A["length"]
+    | (T extends A["length"] ? never : GeneralNumbersUpTo<T, [...A, 0]>);
+type TenDigits = GeneralNumbersUpTo<9>;
+
 declare module "*.png";
 declare module "*.css";
 type KeyDownType =

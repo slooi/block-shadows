@@ -2,6 +2,7 @@ type InputHandlerState = {
     keysDown: { [key: string]: boolean };
     mousePos: { x: number; y: number };
     mouseDown: boolean;
+    lastDigitPressed: TenDigits;
 };
 
 export default function createInputHandler() {
@@ -10,6 +11,7 @@ export default function createInputHandler() {
         keysDown: {},
         mousePos: { x: 0, y: 0 },
         mouseDown: false,
+        lastDigitPressed: 0,
     };
 
     // const keysDown: { [key: string]: boolean } = {};
@@ -17,8 +19,12 @@ export default function createInputHandler() {
     // const mouseDown = false;
 
     // Event Listeners
-    window.addEventListener("keydown",e=>{setKeyTo(e,true)}) // prettier-ignore
-    window.addEventListener("keyup",e=>{setKeyTo(e,false)}) // prettier-ignore
+    window.addEventListener("keydown",e=>{
+		setKeyTo(e,true)
+	}) // prettier-ignore
+    window.addEventListener("keyup",e=>{
+		setKeyTo(e,false)
+	}) // prettier-ignore
 
     const canvas = document.getElementById("canvas")!;
     canvas.addEventListener("mousemove", (e) => {
@@ -37,6 +43,11 @@ export default function createInputHandler() {
     function setKeyTo(e: KeyboardEvent, isDown: boolean) {
         const key = e.key.toLowerCase();
         state.keysDown[key] = isDown;
+
+        const numKey = Number(key);
+        if (([0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as TenDigits[]).indexOf(numKey as TenDigits) !== -1) {
+            state.lastDigitPressed = numKey as TenDigits; // !@#!@#!@# FIX THIS AS TenDigits shit
+        }
     }
 
     // EXTERNAL

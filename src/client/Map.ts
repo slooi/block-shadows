@@ -27,6 +27,7 @@ export default class Map {
     }
 
     createDefaultMap(initalForeground?: number[][]) {
+        // CHANGE THIS LATER SO NO BLOCKS ARE GENERATED FOR SKY BLOCKS
         const tempForeground = new Array(this.diameter);
         for (let y = 0; y < this.diameter; y++) {
             tempForeground[y] = new Array(this.diameter);

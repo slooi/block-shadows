@@ -1,14 +1,16 @@
 import { BlockIndices } from "./importTypes";
 export default class Map {
-    foreground: number[][];
+    foreground: number[];
     diameter: number;
     mapDelta: boolean;
     offset: number;
     offsetData: number[];
     constructor();
     createDefaultMap(initalForeground?: number[][]): void;
-    getMapData1D(): number[];
+    getMapData(): number[];
     placeBlock(blockEdit: PosBlock): void;
+    setBlockIndex(val: number, y: number, x: number): void;
+    getBlockIndex(y: number, x: number): number;
     getMapDelta(): boolean;
     resetMapDelta(): void;
     getOffset(): number;
