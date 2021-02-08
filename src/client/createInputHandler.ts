@@ -45,9 +45,14 @@ export default function createInputHandler() {
         state.keysDown[key] = isDown;
 
         const numKey = Number(key);
-        if (([0, 1, 2, 3, 4, 5, 6, 7, 8, 9] as TenDigits[]).indexOf(numKey as TenDigits) !== -1) {
-            state.lastDigitPressed = numKey as TenDigits; // !@#!@#!@# FIX THIS AS TenDigits shit
+        isTenDigit(numKey);
+        if (isTenDigit(numKey)) {
+            state.lastDigitPressed = numKey;
         }
+    }
+
+    function isTenDigit(num: number): num is TenDigits {
+        return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].includes(num);
     }
 
     // EXTERNAL
