@@ -64,6 +64,7 @@ const animal: Optional<Animal> = {
 -   Use clamp(gl_PoinPosition.x,offset,1.0-offset) instead of doing math without clamp in the texture2D(). Clamp PREVENTS texture bleed with math and
     seems!
 -   Use gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST); for when blocks are zoomed inNOT the mipmap!
+-   Texture UV info (y u need half pixel correction): https://gamedev.stackexchange.com/questions/46963/how-to-avoid-texture-bleeding-in-a-texture-atlas
 
 #### Webgl notes
 

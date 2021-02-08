@@ -1,7 +1,7 @@
 console.log("webgl.ts");
 
 // Images
-import tilemap from "../assets/tilemap.png";
+import tilemap from "../assets/tilemap2.png";
 import lightAtlas from "../assets/lightAtlas.png";
 
 // SHADERS

@@ -38,7 +38,7 @@ export default class Map {
                 ) {
                     tempForeground[y][x] = initalForeground[y][x];
                 } else {
-                    tempForeground[y][x] = 2;
+                    tempForeground[y][x] = 5;
                 }
             }
         }
