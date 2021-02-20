@@ -13,7 +13,7 @@ varying float v_BlockIndex;
 uniform sampler2D u_Textures;
 uniform float u_NumOfBlocks;
 uniform highp float u_BlockDia;
-uniform int u_Mode;
+uniform lowp int u_Mode;
 
 void main(){
 	float pixelLen = 1.0/16.0;
@@ -35,6 +35,6 @@ void main(){
 		);
 	}
 	else{
-		gl_FragColor = texture2D(u_Textures,gl_PointCoord.xy);
+		gl_FragColor = vec4(0,1,1,1);
 	}
 }

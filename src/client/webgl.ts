@@ -207,6 +207,7 @@ async function createRenderer() {
         dataLength = mapForWebgl.length;
         // buildCustomTexture(data); //!@#!@#!@#!@#!#!#!#!@#!@# change later
         buildTextureLightmap(lightmapTexture, map);
+        gl.bindTexture(gl.TEXTURE_2D, tileTexture);
 
         // gl.bindTexture(gl.TEXTURE_2D, tileTexture);
 
@@ -219,6 +220,8 @@ async function createRenderer() {
         offsetDataToLightTextureData(offsetData);
         setTextureData(lightmapTexture);
         gl.bufferSubData(gl.ARRAY_BUFFER, offset, new Float32Array(offsetData));
+
+        gl.bindTexture(gl.TEXTURE_2D, tileTexture);
     }
 
     function offsetDataToLightTextureData(offsetData: number[]) {
@@ -248,7 +251,9 @@ async function createRenderer() {
     }
 
     function render() {
-        gl.drawArrays(gl.POINTS, 0, dataLength / 3);
+        for (let i = 0; i < 10; i++) {
+            gl.drawArrays(gl.POINTS, 0, 1);
+        }
     }
 
     function buildTexture() {
@@ -307,6 +312,8 @@ async function createRenderer() {
 
     function setTextureData(texture: WebGLTexture) {
         // gl.bindTexture()
+
+        gl.bindTexture(gl.TEXTURE_2D, texture);
         const level = 0;
         const internalFormat = gl.RGBA;
         const width = initialConfig.mapDia; //!@#!@# change in the future

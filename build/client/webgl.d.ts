@@ -1,5 +1,5 @@
 declare function createRenderer(): Promise<{
-    bufferData: (data: Array<number>) => void;
+    bufferData: (map: Array<number>) => void;
     clear: () => void;
     render: () => void;
     updateUniform: (updatedUniforms: {
